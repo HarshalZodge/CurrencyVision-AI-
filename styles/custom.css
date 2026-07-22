@@ -1,0 +1,191 @@
+/* CurrencyVision AI - Apple + OpenAI Inspired Glassmorphism Theme CSS */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap');
+
+/* Default Global CSS Variables */
+:root {
+    --bg-primary: #0F172A;
+    --bg-secondary: #1E293B;
+    --bg-card: rgba(30, 41, 59, 0.65);
+    --bg-card-hover: rgba(51, 65, 85, 0.75);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-main: #F8FAFC;
+    --text-muted: #94A3B8;
+    --primary-color: #4F46E5;
+    --primary-glow: rgba(79, 70, 229, 0.4);
+    --secondary-color: #7C3AED;
+    --accent-success: #10B981;
+    --accent-danger: #EF4444;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+/* Light Theme Variable Overrides */
+[data-theme="light"] {
+    --bg-primary: #F8FAFC;
+    --bg-secondary: #F1F5F9;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-card-hover: rgba(255, 255, 255, 0.95);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --text-main: #0F172A;
+    --text-muted: #64748B;
+    --primary-color: #4338CA;
+    --primary-glow: rgba(67, 56, 202, 0.25);
+    --secondary-color: #6D28D9;
+}
+
+/* Main Container Base Styling */
+.main {
+    background-color: var(--bg-primary);
+    font-family: var(--font-body);
+    color: var(--text-main);
+}
+
+.stApp {
+    background: radial-gradient(circle at 50% 0%, rgba(79, 70, 229, 0.15), transparent 70%),
+                radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.1), transparent 50%),
+                var(--bg-primary);
+    background-attachment: fixed;
+}
+
+/* Custom Glassmorphism Hero Section */
+.hero-container {
+    padding: 3rem 2rem;
+    border-radius: 24px;
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-title {
+    font-family: var(--font-heading);
+    font-size: 3.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #F8FAFC 0%, #818CF8 50%, #C084FC 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    max-width: 680px;
+    margin: 0 auto 2rem auto;
+    line-height: 1.6;
+}
+
+/* Glassmorphism Metric Cards */
+.metric-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    background: var(--bg-card-hover);
+    border-color: var(--primary-color);
+    box-shadow: 0 15px 35px var(--primary-glow);
+}
+
+.metric-value {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-top: 0.3rem;
+}
+
+.metric-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+/* AI Insights Translucent Card */
+.insights-card {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.12) 0%, rgba(124, 58, 237, 0.08) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(129, 140, 248, 0.3);
+    border-radius: 20px;
+    padding: 1.8rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+.insights-header {
+    display: flex;
+    align-items: center;
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #818CF8;
+    margin-bottom: 1rem;
+}
+
+/* Custom Styled Buttons */
+.stButton>button {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: #FFFFFF !important;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: none;
+    padding: 0.75rem 1.8rem;
+    box-shadow: 0 8px 25px var(--primary-glow);
+    transition: all 0.3s ease;
+}
+
+.stButton>button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.5);
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+}
+
+/* Sidebar Styling */
+section[data-testid="stSidebar"] {
+    background-color: rgba(15, 23, 42, 0.85) !important;
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border-color);
+}
+
+/* Hide Default Streamlit Branding Elements */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+/* Custom Animated Loader Badge */
+.pulse-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 50px;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-success);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    font-weight: 600;
+    font-size: 0.85rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
