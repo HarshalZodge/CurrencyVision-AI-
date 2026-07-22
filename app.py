@@ -120,13 +120,6 @@ def render_home_page():
         unsafe_allow_html=True,
     )
 
-    # Prominent Hero Call-To-Action Button & Direct Scanner
-    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
-    with col_btn2:
-        if st.button("🔍 Open Full Scanner Page", key="hero_cta_btn", use_container_width=True):
-            st.session_state["nav_page"] = "🔍 Predict Currency"
-            st.rerun()
-
     st.markdown("<br>", unsafe_allow_html=True)
 
     # DIRECT QUICK SCANNER BOX ON HOME PAGE
