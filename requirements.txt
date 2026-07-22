@@ -9,4 +9,3 @@ pillow
 reportlab
 streamlit-lottie
 opencv-python-headless
-tensorflow
