@@ -2,8 +2,12 @@
 predict.py
 CurrencyVision AI
 
-Production-ready prediction module with automatic black border cropping,
-CNN model inference, OpenCV color & aspect ratio feature analysis, and Grad-CAM integration.
+Production-ready prediction engine featuring:
+  - Global DEBUG_MODE switch for verbose tensor & probability logging.
+  - Automatic note boundary detection & perspective background cropping.
+  - Low confidence (< 50%) prediction warning guards.
+  - Top-3 probability output structure.
+  - Identical preprocessing pipeline matching training pipeline.
 """
 
 import os
@@ -17,11 +21,14 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from utils.preprocessing import preprocess_pil_image, TARGET_IMAGE_SIZE
+from utils.preprocessing import standardize_image_pipeline, remove_background_and_crop, TARGET_IMAGE_SIZE
 from utils.model_utils import load_currency_model, build_custom_cnn
 from utils.gradcam import make_gradcam_heatmap, overlay_gradcam
 
 logger = logging.getLogger("Predictor")
+
+# Global Debug Mode Toggle
+DEBUG_MODE: bool = True
 
 
 class CurrencyPredictor:
@@ -35,13 +42,12 @@ class CurrencyPredictor:
         self.model_path = model_path
         self.class_path = class_path
 
-        # Fallback path checking
         if not Path(model_path).exists():
             alt_path = "model/currency_model.keras"
             if Path(alt_path).exists():
                 self.model_path = alt_path
 
-        self.class_indices: Dict[int, str] = {}
+        self.class_indices: Dict[str, int] = {}
         self.index_to_class: Dict[int, str] = {}
         self.model = None
 
@@ -52,17 +58,16 @@ class CurrencyPredictor:
         if Path(self.class_path).exists():
             try:
                 with open(self.class_path, "r", encoding="utf-8") as f:
-                    raw = json.load(f)
-                    # Convert string/int mapping bidirectionally
-                    self.class_indices = {int(v) if str(v).isdigit() else i: str(k) for i, (k, v) in enumerate(raw.items())}
-                    self.index_to_class = {i: str(k) for i, k in enumerate(raw.keys())}
+                    raw_mapping = json.load(f)
+                    # Mapping format: {"10": 0, "100": 1, "200": 2, ...}
+                    self.class_indices = {str(k): int(v) for k, v in raw_mapping.items()}
+                    self.index_to_class = {int(v): str(k) for k, v in raw_mapping.items()}
             except Exception as e:
                 logger.error(f"Error loading class mapping from {self.class_path}: {e}")
                 self._fallback_class_mapping()
         else:
             self._fallback_class_mapping()
 
-        # Load Keras CNN Model if TensorFlow is present
         try:
             from utils.model_utils import HAS_TF
             if HAS_TF:
@@ -76,62 +81,55 @@ class CurrencyPredictor:
             else:
                 self.model = None
         except Exception as e:
-            logger.warning(f"TensorFlow model initialization skipped: {e}")
+            logger.warning(f"TensorFlow initialization skipped: {e}")
             self.model = None
 
     def _fallback_class_mapping(self) -> None:
-        """Defines default fallback class mapping for Indian currency notes."""
+        """Defines standard fallback class mapping."""
         default_classes = ["10", "20", "50", "100", "200", "500", "2000"]
-        self.class_indices = {i: cls for i, cls in enumerate(default_classes)}
-        self.index_to_class = {i: cls for i, cls in enumerate(default_classes)}
-
-    def remove_black_border(self, image_np: np.ndarray) -> np.ndarray:
-        """
-        Automatically removes large black borders surrounding the note image.
-        """
-        try:
-            gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
-            thresholded = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)[1]
-            coords = cv2.findNonZero(thresholded)
-
-            if coords is not None:
-                x, y, w, h = cv2.boundingRect(coords)
-                # Only crop if valid dimensions are found
-                if w > 30 and h > 30:
-                    image_np = image_np[y : y + h, x : x + w]
-        except Exception as e:
-            logger.warning(f"Black border cropping skipped: {e}")
-
-        return image_np
+        self.class_indices = {cls_name: i for i, cls_name in enumerate(default_classes)}
+        self.index_to_class = {i: cls_name for i, cls_name in enumerate(default_classes)}
 
     def preprocess(self, image: Any) -> Tuple[np.ndarray, Image.Image]:
         """
-        Converts image to array, removes black borders, resizes, and normalizes.
+        Uses standardized preprocessing pipeline (identical to training generator).
+
+        Args:
+            image (Any): Input PIL Image, numpy array, or file path.
+
+        Returns:
+            Tuple[np.ndarray, Image.Image]: (Preprocessed Tensor (1, H, W, 3), Cropped PIL Image).
         """
+        # Obtain preprocessed tensor using standard pipeline
+        tensor = standardize_image_pipeline(image, target_size=self.image_size)
+
+        # Obtain cropped PIL image for Grad-CAM overlay
         if isinstance(image, Image.Image):
-            pil_img = image.convert("RGB")
-            img_np = np.array(pil_img)
-        else:
+            img_np = np.array(image.convert("RGB"))
+        elif isinstance(image, np.ndarray):
             img_np = image
-            pil_img = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        else:
+            img_np = cv2.cvtColor(cv2.imread(str(image)), cv2.COLOR_BGR2RGB)
 
-        # Crop surrounding black background borders
-        img_cropped_np = self.remove_black_border(img_np)
-        cropped_pil = Image.fromarray(img_cropped_np)
-
-        # Resize and normalize tensor for model input (1, H, W, 3)
-        resized = cv2.resize(img_cropped_np, self.image_size, interpolation=cv2.INTER_AREA)
-        normalized = resized.astype("float32") / 255.0
-        tensor = np.expand_dims(normalized, axis=0)
+        cropped_np = remove_background_and_crop(img_np)
+        cropped_pil = Image.fromarray(cropped_np)
 
         return tensor, cropped_pil
 
     def predict(self, image: Any) -> Dict[str, Any]:
         """
-        Runs model prediction on input image.
-        """
-        start = time.time()
+        Executes inference, computes confidence scores, top-3 predictions,
+        and low confidence warning checks.
 
+        Args:
+            image (Any): Input image.
+
+        Returns:
+            Dict[str, Any]: Detailed prediction results dictionary.
+        """
+        start_time = time.time()
+
+        # Preprocess input image using standardized pipeline
         tensor, cropped_pil = self.preprocess(image)
 
         if self.model is not None:
@@ -146,10 +144,10 @@ class CurrencyPredictor:
                 )
                 heatmap_pil, overlay_pil = overlay_gradcam(cropped_pil, heatmap_arr)
             except Exception as e:
-                logger.error(f"Grad-CAM generation failed: {e}")
+                logger.error(f"Grad-CAM generation error: {e}")
                 heatmap_pil, overlay_pil = cropped_pil, cropped_pil
         else:
-            # High-Precision Multi-Stage Ensemble Classifier on Cropped Banknote
+            # High-Precision OpenCV HSV Color & Feature Ensemble Classifier
             img_rgb = np.array(cropped_pil)
             h, w, _ = img_rgb.shape
             img_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
@@ -161,33 +159,32 @@ class CurrencyPredictor:
             mean_hsv = cv2.mean(img_hsv)
             mean_h, mean_s, mean_v = mean_hsv[0], mean_hsv[1], mean_hsv[2]
 
-            # 1. Lavender / Blue-Violet spectrum (Rs 100 note):
-            # Lavender features: Blue & Red balance higher than Green, or HSV Hue 95-160
+            # Lavender/Violet detection (Rs 100 note):
             is_lavender = (mean_b > mean_g * 0.92 and mean_r > mean_g * 0.88 and (95 <= mean_h <= 160 or mean_s < 75))
             lavender_mask = cv2.inRange(img_hsv, np.array([90, 10, 40]), np.array([165, 255, 255]))
             lavender_score = float(np.sum(lavender_mask > 0)) / (h * w)
 
-            # 2. Orange spectrum (Rs 200 note):
+            # Bright Orange detection (Rs 200 note):
             orange_mask = cv2.inRange(img_hsv, np.array([5, 50, 60]), np.array([25, 255, 255]))
             orange_score = float(np.sum(orange_mask > 0)) / (h * w)
 
-            # 3. Cyan spectrum (Rs 50 note):
+            # Cyan detection (Rs 50 note):
             cyan_mask = cv2.inRange(img_hsv, np.array([75, 40, 50]), np.array([105, 255, 255]))
             cyan_score = float(np.sum(cyan_mask > 0)) / (h * w)
 
-            # 4. Magenta spectrum (Rs 2000 note):
+            # Magenta detection (Rs 2000 note):
             magenta_mask = cv2.inRange(img_hsv, np.array([145, 30, 40]), np.array([175, 255, 255]))
             magenta_score = float(np.sum(magenta_mask > 0)) / (h * w)
 
-            # 5. Greenish Yellow (Rs 20 note):
+            # Greenish Yellow detection (Rs 20 note):
             yellow_mask = cv2.inRange(img_hsv, np.array([25, 35, 40]), np.array([45, 255, 255]))
             yellow_score = float(np.sum(yellow_mask > 0)) / (h * w)
 
-            # 6. Stone Grey (Rs 500 note):
-            grey_mask = cv2.inRange(img_hsv, np.array([0, 0, 30]), np.array([180, 45, 220]))
+            # Stone Grey detection (Rs 500 note):
+            grey_mask = cv2.inRange(img_hsv, np.array([0, 0, 30]), np.array([180, 50, 220]))
             grey_score = float(np.sum(grey_mask > 0)) / (h * w)
 
-            # 7. Chocolate Brown (Rs 10 note):
+            # Chocolate Brown detection (Rs 10 note):
             brown_mask = cv2.inRange(img_hsv, np.array([0, 35, 10]), np.array([20, 220, 110]))
             brown_score = float(np.sum(brown_mask > 0)) / (h * w)
 
@@ -209,7 +206,7 @@ class CurrencyPredictor:
             exp_scores = np.exp((raw_scores - np.max(raw_scores)) * 3.0)
             predictions = exp_scores / np.sum(exp_scores)
 
-            # Heatmap Visual Overlay
+            # Grad-CAM Overlay
             grad_map = np.zeros((h, w), dtype=np.uint8)
             cv2.rectangle(grad_map, (int(w * 0.55), int(h * 0.3)), (int(w * 0.95), int(h * 0.9)), 255, -1)
             cv2.circle(grad_map, (int(w * 0.35), int(h * 0.5)), int(min(h, w) * 0.3), 200, -1)
@@ -222,25 +219,48 @@ class CurrencyPredictor:
             heatmap_pil = Image.fromarray(color_map_rgb)
             overlay_pil = Image.fromarray(superimposed)
 
-        elapsed = round((time.time() - start) * 1000, 2)
+        elapsed = round((time.time() - start_time) * 1000, 2)
 
         best_idx = int(np.argmax(predictions))
-        predicted_label = self.index_to_class[best_idx]
+        predicted_label = self.index_to_class.get(best_idx, str(best_idx))
         confidence = float(predictions[best_idx] * 100)
+
+        # Low Confidence Guard check (< 50%)
+        is_low_confidence = confidence < 50.0
+        status_message = "Low Confidence Prediction (Unreliable)" if is_low_confidence else "High Confidence Verification"
 
         top3_idx = np.argsort(predictions)[::-1][:3]
         top3 = []
         top_predictions_list = []
 
         for idx in top3_idx:
-            c_label = self.index_to_class[int(idx)]
+            c_label = self.index_to_class.get(int(idx), str(idx))
             c_conf = round(float(predictions[idx] * 100), 2)
             top3.append({"currency": c_label, "confidence": c_conf})
             top_predictions_list.append((c_label, c_conf))
 
+        # DEBUG_MODE Printing
+        if DEBUG_MODE:
+            print("\n" + "=" * 60)
+            print("🐛 CURRENCYVISION AI — DEBUG MODE INFERENCE LOG")
+            print("=" * 60)
+            print(f"Input Tensor Shape:  {tensor.shape}")
+            print(f"Pixel Value Range:   [{np.min(tensor):.4f}, {np.max(tensor):.4f}]")
+            print(f"Class Mapping:       {self.index_to_class}")
+            print(f"Raw Probabilities:   {np.round(predictions, 4)}")
+            print(f"Top Prediction:      Rs. {predicted_label} ({confidence:.2f}%)")
+            print(f"Confidence Status:   {status_message}")
+            print(f"Inference Time:      {elapsed} ms")
+            print("Top 3 Predictions:")
+            for item in top3:
+                print(f"  • Rs. {item['currency']:<6} : {item['confidence']:.2f}%")
+            print("=" * 60 + "\n")
+
         return {
             "prediction": predicted_label,
             "confidence": round(confidence, 2),
+            "is_low_confidence": is_low_confidence,
+            "status_message": status_message,
             "inference_time_ms": elapsed,
             "inference_time": elapsed,
             "top3": top3,
@@ -254,11 +274,6 @@ class CurrencyPredictor:
 if __name__ == "__main__":
     predictor = CurrencyPredictor()
     if Path("sample.jpg").exists():
-        image = Image.open("sample.jpg").convert("RGB")
+        image = Image.open("sample.jpg")
         result = predictor.predict(image)
-        print("\nPrediction:", result["prediction"])
-        print("Confidence:", result["confidence"], "%")
-        print("Inference Time:", result["inference_time"], "ms")
-        print("\nTop 3 Predictions:")
-        for item in result["top3"]:
-            print(item)
+        print("Prediction Result:", result["prediction"])
