@@ -137,7 +137,7 @@ def render_home_page():
             res = predictor.predict(input_image)
 
             st.success(f"✅ Detected Currency: **Rs. {res['prediction']}** (Confidence: {res['confidence']:.2f}%)")
-            
+
             c1, c2 = st.columns([1, 1])
             with c1:
                 st.image(input_image, caption="Uploaded Note", use_container_width=True)
@@ -145,7 +145,52 @@ def render_home_page():
                 fig_g = plot_confidence_gauge(res['confidence'], res['prediction'])
                 st.plotly_chart(fig_g, use_container_width=True)
 
-            st.info("💡 For complete Grad-CAM explainable heatmaps and PDF report downloads, switch to '🔍 Predict Currency' page.")
+            # Record session history
+            rec = {
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "prediction": f"Rs. {res['prediction']}",
+                "confidence": f"{res['confidence']:.2f}%",
+                "inference_time_ms": f"{res['inference_time_ms']:.2f}",
+                "model_version": "v1.0.0",
+            }
+            if rec not in st.session_state["prediction_history"]:
+                st.session_state["prediction_history"].insert(0, rec)
+
+            # Export Buttons Section
+            st.markdown("#### 📄 Export Analysis Report")
+            r1, r2, r3 = st.columns(3)
+
+            pdf_b = generate_pdf_report(res)
+            json_s = generate_json_report(res)
+            csv_s = generate_csv_report(st.session_state["prediction_history"])
+
+            with r1:
+                st.download_button(
+                    label="📥 PDF Report",
+                    data=pdf_b,
+                    file_name=f"Currency_Report_{res['prediction']}.pdf",
+                    mime="application/pdf",
+                    key="home_pdf_btn",
+                    use_container_width=True,
+                )
+            with r2:
+                st.download_button(
+                    label="📥 JSON Data",
+                    data=json_s,
+                    file_name=f"Currency_Report_{res['prediction']}.json",
+                    mime="application/json",
+                    key="home_json_btn",
+                    use_container_width=True,
+                )
+            with r3:
+                st.download_button(
+                    label="📥 CSV History",
+                    data=csv_s,
+                    file_name="Prediction_History.csv",
+                    mime="text/csv",
+                    key="home_csv_btn",
+                    use_container_width=True,
+                )
         except Exception as e:
             st.error(f"Error processing image: {e}")
 
