@@ -77,23 +77,35 @@ def render_sidebar_navigation() -> str:
     )
     st.sidebar.markdown("---")
 
+    nav_options = [
+        "🏠 Home",
+        "🔍 Predict Currency",
+        "📊 Model Dashboard",
+        "🛡️ Security Guide",
+        "ℹ️ About AI",
+    ]
+
+    # Initialize nav_page in session state if missing
+    if "nav_page" not in st.session_state or st.session_state["nav_page"] not in nav_options:
+        st.session_state["nav_page"] = "🏠 Home"
+
+    current_index = nav_options.index(st.session_state["nav_page"])
+
     page = st.sidebar.radio(
         "Navigation",
-        [
-            "🏠 Home",
-            "🔍 Predict Currency",
-            "📊 Model Dashboard",
-            "🛡️ Security Guide",
-            "ℹ️ About AI",
-        ],
-        index=0,
+        nav_options,
+        index=current_index,
+        key="sidebar_nav_radio",
     )
+
+    # Sync state
+    st.session_state["nav_page"] = page
 
     render_theme_toggle_button()
 
     st.sidebar.markdown("---")
     st.sidebar.caption("© 2026 CurrencyVision AI • Enterprise Deep Learning Solution")
-    return page
+    return st.session_state["nav_page"]
 
 
 # ==============================================================================
@@ -113,6 +125,15 @@ def render_home_page():
         """,
         unsafe_allow_html=True,
     )
+
+    # Prominent Hero Call-To-Action Button
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    with col_btn2:
+        if st.button("🔍 Launch Currency Note Scanner (Upload / Camera)", key="hero_cta_btn", use_container_width=True):
+            st.session_state["nav_page"] = "🔍 Predict Currency"
+            st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Top Animated Stat Cards
     col1, col2, col3, col4 = st.columns(4)
