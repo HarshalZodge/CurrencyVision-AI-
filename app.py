@@ -89,23 +89,17 @@ def render_sidebar_navigation() -> str:
     if "nav_page" not in st.session_state or st.session_state["nav_page"] not in nav_options:
         st.session_state["nav_page"] = "🏠 Home"
 
-    current_index = nav_options.index(st.session_state["nav_page"])
-
     page = st.sidebar.radio(
         "Navigation",
         nav_options,
-        index=current_index,
-        key="sidebar_nav_radio",
+        key="nav_page"
     )
-
-    # Sync state
-    st.session_state["nav_page"] = page
 
     render_theme_toggle_button()
 
     st.sidebar.markdown("---")
     st.sidebar.caption("© 2026 CurrencyVision AI • Enterprise Deep Learning Solution")
-    return st.session_state["nav_page"]
+    return page
 
 
 # ==============================================================================
@@ -126,12 +120,41 @@ def render_home_page():
         unsafe_allow_html=True,
     )
 
-    # Prominent Hero Call-To-Action Button
+    # Prominent Hero Call-To-Action Button & Direct Scanner
     col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
     with col_btn2:
-        if st.button("🔍 Launch Currency Note Scanner (Upload / Camera)", key="hero_cta_btn", use_container_width=True):
+        if st.button("🔍 Open Full Scanner Page", key="hero_cta_btn", use_container_width=True):
             st.session_state["nav_page"] = "🔍 Predict Currency"
             st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # DIRECT QUICK SCANNER BOX ON HOME PAGE
+    st.markdown("### ⚡ Quick Banknote Scanner")
+    quick_file = st.file_uploader(
+        "Drop your Indian Banknote image here to scan immediately (JPG, PNG, WEBP)",
+        type=["jpg", "jpeg", "png", "webp"],
+        key="home_quick_uploader",
+    )
+
+    if quick_file is not None:
+        try:
+            input_image = Image.open(quick_file)
+            predictor = get_predictor_instance()
+            res = predictor.predict(input_image)
+
+            st.success(f"✅ Detected Currency: **Rs. {res['prediction']}** (Confidence: {res['confidence']:.2f}%)")
+            
+            c1, c2 = st.columns([1, 1])
+            with c1:
+                st.image(input_image, caption="Uploaded Note", use_container_width=True)
+            with c2:
+                fig_g = plot_confidence_gauge(res['confidence'], res['prediction'])
+                st.plotly_chart(fig_g, use_container_width=True)
+
+            st.info("💡 For complete Grad-CAM explainable heatmaps and PDF report downloads, switch to '🔍 Predict Currency' page.")
+        except Exception as e:
+            st.error(f"Error processing image: {e}")
 
     st.markdown("<br>", unsafe_allow_html=True)
 
