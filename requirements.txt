@@ -1,13 +1,12 @@
-# CurrencyVision AI - Production Requirements (Streamlit Cloud Compatible)
-tensorflow-cpu>=2.10.0
-opencv-python-headless>=4.6.0
-numpy>=1.21.0
-pandas>=1.3.0
-matplotlib>=3.4.0
-seaborn>=0.11.0
-scikit-learn>=1.0.0
-streamlit>=1.20.0
-plotly>=5.10.0
-pillow>=8.4.0
-reportlab>=3.6.0
-streamlit-lottie>=0.0.3
+streamlit
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+plotly
+pillow
+reportlab
+streamlit-lottie
+opencv-python-headless
+tensorflow
