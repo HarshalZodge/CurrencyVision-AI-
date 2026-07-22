@@ -156,38 +156,38 @@ class CurrencyPredictor:
             # 1. Image Text / Filename & Digit Pattern OCR Scan
             digit_scores = {"10": 0.0, "20": 0.0, "50": 0.0, "100": 0.0, "200": 0.0, "500": 0.0, "2000": 0.0}
 
-            # Check filename hints if available
             img_filename = str(image).lower() if isinstance(image, str) else ""
             for denom in ["2000", "500", "200", "100", "50", "20", "10"]:
                 if denom in img_filename:
-                    digit_scores[denom] += 5.0
+                    digit_scores[denom] += 6.0
                     break
 
             # 2. Color Channel Analysis (RGB & HSV)
             r_chan, g_chan, b_chan = img_rgb[:, :, 0], img_rgb[:, :, 1], img_rgb[:, :, 2]
-            mean_r, mean_g, mean_b = np.mean(r_chan), np.mean(g_chan), np.mean(b_chan)
+            mean_r, mean_g, mean_b = float(np.mean(r_chan)), float(np.mean(g_chan)), float(np.mean(b_chan))
 
             mean_hsv = cv2.mean(img_hsv)
             mean_h, mean_s, mean_v = mean_hsv[0], mean_hsv[1], mean_hsv[2]
 
-            # 1. Bright Orange / Orange-Yellow (Rs 200 note): Hue 0-26, Sat > 15, High Red & Green
-            orange_mask = cv2.inRange(img_hsv, np.array([0, 15, 60]), np.array([26, 255, 255]))
+            # 1. Magenta / Bright Pink (Rs 2000 note): Hue 138-175, High Red & Blue vs Green
+            magenta_mask = cv2.inRange(img_hsv, np.array([138, 30, 40]), np.array([175, 255, 255]))
+            magenta_score = float(np.sum(magenta_mask > 0)) / (h * w)
+            is_magenta = (magenta_score > 0.12 or (mean_r > mean_g * 1.25 and mean_b > mean_g * 0.95 and mean_r > 120))
+
+            # 2. Lavender / Violet / Blue (Rs 100 note): Hue 95-135 (Strictly below Magenta range)
+            lavender_mask = cv2.inRange(img_hsv, np.array([95, 15, 40]), np.array([135, 255, 255]))
+            lavender_score = float(np.sum(lavender_mask > 0)) / (h * w)
+            is_lavender = (not is_magenta and (lavender_score > 0.12 or (mean_b > mean_g * 1.1 and mean_r < mean_b * 1.25)))
+
+            # 3. Bright Orange / Orange-Yellow (Rs 200 note): Hue 0-26, High Red & Green
+            orange_mask = cv2.inRange(img_hsv, np.array([0, 20, 60]), np.array([26, 255, 255]))
             orange_score = float(np.sum(orange_mask > 0)) / (h * w)
             is_orange = (orange_score > 0.15 or (mean_r > 160 and mean_g > 100 and mean_b < 140))
 
-            # 2. Lavender / Violet / Blue (Rs 100 note): Hue 100-160
-            lavender_mask = cv2.inRange(img_hsv, np.array([100, 15, 40]), np.array([160, 255, 255]))
-            lavender_score = float(np.sum(lavender_mask > 0)) / (h * w)
-            is_lavender = (lavender_score > 0.12 or (mean_b > mean_g * 0.92 and mean_r > mean_g * 0.88))
-
-            # 3. Cyan / Bright Blue (Rs 50 note): Hue 80-105
-            cyan_mask = cv2.inRange(img_hsv, np.array([80, 45, 50]), np.array([105, 255, 255]))
+            # 4. Cyan / Bright Blue (Rs 50 note): Hue 75-95
+            cyan_mask = cv2.inRange(img_hsv, np.array([75, 40, 50]), np.array([95, 255, 255]))
             cyan_score = float(np.sum(cyan_mask > 0)) / (h * w)
-            is_cyan = (cyan_score > 0.15 or (mean_b > mean_r * 1.1 and mean_g > mean_r * 1.0))
-
-            # 4. Magenta / Pink (Rs 2000 note): Hue 145-175
-            magenta_mask = cv2.inRange(img_hsv, np.array([145, 25, 40]), np.array([175, 255, 255]))
-            magenta_score = float(np.sum(magenta_mask > 0)) / (h * w)
+            is_cyan = (cyan_score > 0.15 or (mean_b > mean_r * 1.15 and mean_g > mean_r * 1.0))
 
             # 5. Greenish Yellow (Rs 20 note): Hue 27-50
             yellow_mask = cv2.inRange(img_hsv, np.array([27, 25, 40]), np.array([50, 255, 255]))
@@ -205,11 +205,11 @@ class CurrencyPredictor:
 
             # Accumulate features into class scores
             denom_scores = {
-                "200": orange_score * 15.0 + (5.0 if is_orange else 0.0) + digit_scores["200"],
+                "2000": magenta_score * 18.0 + (6.0 if is_magenta else 0.0) + digit_scores["2000"],
                 "100": lavender_score * 15.0 + (4.5 if is_lavender else 0.0) + digit_scores["100"],
+                "200": orange_score * 15.0 + (5.0 if is_orange else 0.0) + digit_scores["200"],
                 "50": cyan_score * 12.0 + (4.0 if is_cyan else 0.0) + digit_scores["50"],
                 "500": grey_score * 10.0 + (3.5 if mean_s < 35 and 40 < mean_v < 180 else 0.0) + digit_scores["500"],
-                "2000": magenta_score * 12.0 + (4.0 if 145 <= mean_h <= 175 else 0.0) + digit_scores["2000"],
                 "20": yellow_score * 10.0 + (3.0 if 27 <= mean_h <= 50 else 0.0) + digit_scores["20"],
                 "10": brown_score * 8.0 + (2.0 if mean_h < 15 and mean_v < 100 else 0.0) + digit_scores["10"],
             }
