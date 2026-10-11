@@ -69,8 +69,7 @@ def render_sidebar_navigation() -> str:
             <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; margin: 0; background: linear-gradient(135deg, #818CF8, #C084FC); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 💰 CurrencyVision AI
             </h2>
-            <p style="font-size: 0.8rem; color: #94A3B8; margin-top: 4px;">Indian Banknote Neural Scanner</p>
-            <span class="pulse-badge">● Engine v1.0 Active</span>
+            <p style="font-size: 0.8rem; color: #94A3B8; margin-top: 4px;">Indian Banknote Recognition</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -82,10 +81,9 @@ def render_sidebar_navigation() -> str:
         "🔍 Predict Currency",
         "📊 Model Dashboard",
         "🛡️ Security Guide",
-        "ℹ️ About AI",
+        "ℹ️ About",
     ]
 
-    # Initialize nav_page in session state if missing
     if "nav_page" not in st.session_state or st.session_state["nav_page"] not in nav_options:
         st.session_state["nav_page"] = "🏠 Home"
 
@@ -97,8 +95,21 @@ def render_sidebar_navigation() -> str:
 
     render_theme_toggle_button()
 
+    # Live session scan counter
+    scan_count = len(st.session_state.get("prediction_history", []))
+    if scan_count > 0:
+        st.sidebar.markdown(
+            f"""<div style="text-align:center; margin-top:0.5rem; padding:0.5rem; border-radius:8px; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3);">
+                <span style="font-size:0.85rem; color:#818CF8;">🔍 Notes scanned: <b>{scan_count}</b></span>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+
     st.sidebar.markdown("---")
-    st.sidebar.caption("© 2026 CurrencyVision AI • Enterprise Deep Learning Solution")
+    st.sidebar.markdown(
+        "<div style='text-align:center; font-size:0.78rem; color:#64748B;'>Built by <b style='color:#818CF8;'>Harshal Zodge</b><br/>© 2026 CurrencyVision AI</div>",
+        unsafe_allow_html=True,
+    )
     return page
 
 
@@ -106,14 +117,25 @@ def render_sidebar_navigation() -> str:
 # PAGE 1: HOME PAGE
 # ==============================================================================
 def render_home_page():
-    """Renders Landing Page with Hero Section, Feature Cards & Statistics."""
+    """Renders Landing Page with Hero Section, How It Works & Quick Scanner."""
+
+    # Denomination fun facts
+    NOTE_FACTS = {
+        "10": "₹10 notes feature the Sun Temple at Konark on the reverse side.",
+        "20": "₹20 notes display the scenic Ellora Caves on the reverse — a UNESCO World Heritage Site.",
+        "50": "₹50 notes showcase the Hampi with Chariot, reflecting India's rich architectural heritage.",
+        "100": "₹100 notes feature the Rani ki vav stepwell in Gujarat, a UNESCO World Heritage Site.",
+        "200": "₹200 notes display the Sanchi Stupa, one of the oldest stone structures in India.",
+        "500": "₹500 notes feature the Red Fort, the iconic symbol of India's independence.",
+        "2000": "₹2000 notes were introduced in November 2016 during demonetization, featuring India's Mars mission — Mangalyaan.",
+    }
+
     st.markdown(
         """
         <div class="hero-container">
             <h1 class="hero-title">Indian Currency Recognition<br>Powered by Deep Learning</h1>
             <p class="hero-subtitle">
-                An enterprise-grade Convolutional Neural Network designed to identify Indian banknote denominations 
-                with explainable AI activation heatmaps and real-time webcam support.
+                Upload a photo of any Indian currency note and get instant denomination detection with visual AI explanation.
             </p>
         </div>
         """,
@@ -122,7 +144,77 @@ def render_home_page():
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # DIRECT QUICK SCANNER BOX ON HOME PAGE
+    # Stat Cards
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.markdown(
+            """<div class="metric-card">
+                <div class="metric-label">Model Accuracy</div>
+                <div class="metric-value" style="color: #10B981;">98.4%</div>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+    with col2:
+        st.markdown(
+            """<div class="metric-card">
+                <div class="metric-label">Supported Notes</div>
+                <div class="metric-value" style="color: #6366F1;">7 Classes</div>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+    with col3:
+        st.markdown(
+            """<div class="metric-card">
+                <div class="metric-label">Avg Speed</div>
+                <div class="metric-value" style="color: #F59E0B;">~18 ms</div>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+    with col4:
+        st.markdown(
+            """<div class="metric-card">
+                <div class="metric-label">Visual Explanation</div>
+                <div class="metric-value" style="color: #EC4899;">Grad-CAM</div>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # How It Works — 3-step guide
+    st.markdown("### 📖 How It Works")
+    s1, s2, s3 = st.columns(3)
+    with s1:
+        st.markdown(
+            """<div class="metric-card" style="text-align:center;">
+                <div style="font-size:2rem;">📸</div>
+                <h4 style="color:#818CF8; margin:0.5rem 0 0.3rem;">Step 1 — Upload</h4>
+                <p style="font-size:0.9rem; color:#94A3B8; margin:0;">Drop or upload a clear photo of any Indian banknote (₹10 to ₹2000).</p>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+    with s2:
+        st.markdown(
+            """<div class="metric-card" style="text-align:center;">
+                <div style="font-size:2rem;">🧠</div>
+                <h4 style="color:#C084FC; margin:0.5rem 0 0.3rem;">Step 2 — AI Scans</h4>
+                <p style="font-size:0.9rem; color:#94A3B8; margin:0;">Our deep learning model analyzes color, shape, and pattern features in milliseconds.</p>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+    with s3:
+        st.markdown(
+            """<div class="metric-card" style="text-align:center;">
+                <div style="font-size:2rem;">✅</div>
+                <h4 style="color:#34D399; margin:0.5rem 0 0.3rem;">Step 3 — Get Result</h4>
+                <p style="font-size:0.9rem; color:#94A3B8; margin:0;">See the detected denomination, confidence score, and download a full report.</p>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Quick Scanner
     st.markdown("### ⚡ Quick Banknote Scanner")
     quick_file = st.file_uploader(
         "Drop your Indian Banknote image here to scan immediately (JPG, PNG, WEBP)",
@@ -145,6 +237,11 @@ def render_home_page():
                 fig_g = plot_confidence_gauge(res['confidence'], res['prediction'])
                 st.plotly_chart(fig_g, use_container_width=True)
 
+            # Fun fact about the detected note
+            fact = NOTE_FACTS.get(str(res['prediction']), "")
+            if fact:
+                st.info(f"💡 **Did you know?** {fact}")
+
             # Record session history
             rec = {
                 "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -156,10 +253,9 @@ def render_home_page():
             if rec not in st.session_state["prediction_history"]:
                 st.session_state["prediction_history"].insert(0, rec)
 
-            # Export Buttons Section
+            # Export Buttons
             st.markdown("#### 📄 Export Analysis Report")
             r1, r2, r3 = st.columns(3)
-
             pdf_b = generate_pdf_report(res)
             json_s = generate_json_report(res)
             csv_s = generate_csv_report(st.session_state["prediction_history"])
@@ -193,96 +289,6 @@ def render_home_page():
                 )
         except Exception as e:
             st.error(f"Error processing image: {e}")
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Top Animated Stat Cards
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.markdown(
-            """
-            <div class="metric-card">
-                <div class="metric-label">Model Accuracy</div>
-                <div class="metric-value" style="color: #10B981;">98.4%</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with col2:
-        st.markdown(
-            """
-            <div class="metric-card">
-                <div class="metric-label">Supported Notes</div>
-                <div class="metric-value" style="color: #6366F1;">7 Classes</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with col3:
-        st.markdown(
-            """
-            <div class="metric-card">
-                <div class="metric-label">Avg Inference</div>
-                <div class="metric-value" style="color: #F59E0B;">~18 ms</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with col4:
-        st.markdown(
-            """
-            <div class="metric-card">
-                <div class="metric-label">Explainable AI</div>
-                <div class="metric-value" style="color: #EC4899;">Grad-CAM</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Key Features Grid
-    st.markdown("### ⚡ Key Capabilities")
-    f_col1, f_col2, f_col3 = st.columns(3)
-
-    with f_col1:
-        st.markdown(
-            """
-            <div class="metric-card" style="text-align: left; height: 100%;">
-                <h4 style="color: #818CF8; font-family: 'Outfit';">🧠 Custom CNN Pipeline</h4>
-                <p style="font-size: 0.9rem; color: #94A3B8;">
-                    Built with He Normal initialization, BatchNorm, and Multi-stage Dropout to prevent overfitting.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with f_col2:
-        st.markdown(
-            """
-            <div class="metric-card" style="text-align: left; height: 100%;">
-                <h4 style="color: #C084FC; font-family: 'Outfit';">👁️ Explainable AI (Grad-CAM)</h4>
-                <p style="font-size: 0.9rem; color: #94A3B8;">
-                    Visualize spatial focus areas highlighting security threads, watermarks, and value numbers.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with f_col3:
-        st.markdown(
-            """
-            <div class="metric-card" style="text-align: left; height: 100%;">
-                <h4 style="color: #34D399; font-family: 'Outfit';">📄 Multi-Format Export</h4>
-                <p style="font-size: 0.9rem; color: #94A3B8;">
-                    Generate downloadable analysis verification reports instantly in PDF, CSV, and JSON formats.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
 
 
 # ==============================================================================
@@ -478,49 +484,43 @@ def render_predict_page():
 # ==============================================================================
 def render_dashboard_page():
     """Renders Model Evaluation Metrics, Confusion Matrix, and Training Curves."""
-    st.markdown("## 📊 Custom CNN Model Dashboard & Metrics")
-    st.caption("Detailed statistical evaluation of the trained deep learning network.")
+    st.markdown("## 📊 Model Performance Dashboard")
+    st.caption("Statistical evaluation of the trained deep learning network.")
+
+    st.info("ℹ️ **Note:** The charts below show sample metrics for demonstration. Train the model with your own dataset using `train.py` to see your real accuracy and loss curves.")
 
     # Model Parameters Cards
     m1, m2, m3, m4 = st.columns(4)
     with m1:
         st.markdown(
-            """
-            <div class="metric-card">
-                <div class="metric-label">Input Tensor</div>
-                <div class="metric-value">128x128x3</div>
-            </div>
-            """,
+            """<div class="metric-card">
+                <div class="metric-label">Input Image Size</div>
+                <div class="metric-value">128×128</div>
+            </div>""",
             unsafe_allow_html=True,
         )
     with m2:
         st.markdown(
-            """
-            <div class="metric-card">
+            """<div class="metric-card">
                 <div class="metric-label">Total Parameters</div>
                 <div class="metric-value" style="color: #818CF8;">~2.4 M</div>
-            </div>
-            """,
+            </div>""",
             unsafe_allow_html=True,
         )
     with m3:
         st.markdown(
-            """
-            <div class="metric-card">
+            """<div class="metric-card">
                 <div class="metric-label">Optimizer</div>
                 <div class="metric-value" style="color: #34D399;">Adam</div>
-            </div>
-            """,
+            </div>""",
             unsafe_allow_html=True,
         )
     with m4:
         st.markdown(
-            """
-            <div class="metric-card">
-                <div class="metric-label">Weight Init</div>
-                <div class="metric-value" style="color: #F43F5E;">He Normal</div>
-            </div>
-            """,
+            """<div class="metric-card">
+                <div class="metric-label">Supported Classes</div>
+                <div class="metric-value" style="color: #F43F5E;">7 Notes</div>
+            </div>""",
             unsafe_allow_html=True,
         )
 
@@ -606,31 +606,88 @@ def render_security_page():
 # PAGE 5: ABOUT PAGE
 # ==============================================================================
 def render_about_page():
-    """Renders System Architecture, Technology Stack, and Project Details."""
+    """Renders About page with creator bio, project info, and technology stack."""
     st.markdown("## ℹ️ About CurrencyVision AI")
 
+    # Creator Card
     st.markdown(
         """
-        ### 🚀 Project Overview
-        CurrencyVision AI is an end-to-end computer vision solution engineered to automatically recognize 
-        and classify Indian banknote denominations using a custom deep learning Convolutional Neural Network (CNN).
+        <div class="metric-card" style="text-align:center; padding: 2rem; margin-bottom: 1.5rem;">
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">👨‍💻</div>
+            <h2 style="font-family:'Outfit'; font-size:1.8rem; margin:0; background: linear-gradient(135deg, #818CF8, #C084FC); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+                Harshal Zodge
+            </h2>
+            <p style="color:#94A3B8; font-size:1rem; margin:0.5rem 0 1rem;">
+                AI / ML Developer · Deep Learning Enthusiast
+            </p>
+            <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
+                <a href="https://github.com/HarshalZodge" target="_blank"
+                   style="background:#1E293B; color:#818CF8; padding:0.4rem 1.2rem; border-radius:6px; text-decoration:none; font-size:0.9rem; border:1px solid rgba(129,140,248,0.3);">
+                    🐙 GitHub
+                </a>
+                <a href="https://www.linkedin.com/in/harshal-zodge" target="_blank"
+                   style="background:#1E293B; color:#34D399; padding:0.4rem 1.2rem; border-radius:6px; text-decoration:none; font-size:0.9rem; border:1px solid rgba(52,211,153,0.3);">
+                    💼 LinkedIn
+                </a>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-        ### 🧠 Network Architecture Specifications
-        - **Input Layer:** `(128, 128, 3)` RGB Normalized Image Tensors.
-        - **Block 1:** `Conv2D(32, 3x3, He Normal)` → `BatchNormalization` → `ReLU` → `MaxPool(2x2)`
-        - **Block 2:** `Conv2D(64, 3x3, He Normal)` → `BatchNormalization` → `ReLU` → `MaxPool(2x2)`
-        - **Block 3:** `Conv2D(128, 3x3, He Normal)` → `BatchNormalization` → `ReLU` → `Dropout(0.3)`
-        - **Block 4 (Grad-CAM Target):** `Conv2D(128, 3x3, He Normal)` → `BatchNormalization` → `ReLU` → `Dropout(0.4)`
-        - **Dense Head:** `Flatten` → `Dense(256, ReLU)` → `Dropout(0.5)` → `Dense(7, Softmax)`
+    # Project Overview
+    st.markdown("### 🚀 Project Overview")
+    st.markdown(
+        """
+        **CurrencyVision AI** is an end-to-end computer vision project built to automatically identify Indian banknote denominations from a photo.
 
-        ### 🛠️ Technology Stack
-        - **Core ML:** Python 3.10+, TensorFlow / Keras, Scikit-Learn
-        - **Vision:** OpenCV, Pillow
-        - **Data Handling:** NumPy, Pandas
-        - **UI/UX:** Streamlit, Custom CSS (Glassmorphism), Plotly
-        - **Reporting:** ReportLab PDF Engine
+        You simply upload an image of any ₹10, ₹20, ₹50, ₹100, ₹200, ₹500, or ₹2000 note — and the AI tells you which one it is, with a confidence score and a visual heat map showing *why* it made that prediction.
+
+        This project was built entirely from scratch — the model, the training pipeline, and the web interface.
         """
     )
+
+    st.markdown("### 🛠️ Built With")
+    t1, t2, t3 = st.columns(3)
+    with t1:
+        st.markdown(
+            """<div class="metric-card" style="text-align:center;">
+                <div style="font-size:1.8rem;">🧠</div>
+                <h4 style="color:#818CF8; margin:0.4rem 0 0.2rem;">Machine Learning</h4>
+                <p style="font-size:0.85rem; color:#94A3B8; margin:0;">TensorFlow · Keras · OpenCV · NumPy</p>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+    with t2:
+        st.markdown(
+            """<div class="metric-card" style="text-align:center;">
+                <div style="font-size:1.8rem;">🌐</div>
+                <h4 style="color:#C084FC; margin:0.4rem 0 0.2rem;">Web Interface</h4>
+                <p style="font-size:0.85rem; color:#94A3B8; margin:0;">Streamlit · Plotly · Custom CSS</p>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+    with t3:
+        st.markdown(
+            """<div class="metric-card" style="text-align:center;">
+                <div style="font-size:1.8rem;">📄</div>
+                <h4 style="color:#34D399; margin:0.4rem 0 0.2rem;">Reporting</h4>
+                <p style="font-size:0.85rem; color:#94A3B8; margin:0;">ReportLab · Pandas · JSON</p>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("### 🌐 Supported Denominations")
+    notes = ["₹10", "₹20", "₹50", "₹100", "₹200", "₹500", "₹2000"]
+    cols = st.columns(7)
+    for i, (col, note) in enumerate(zip(cols, notes)):
+        colors_list = ["#F59E0B", "#34D399", "#06B6D4", "#818CF8", "#F97316", "#94A3B8", "#EC4899"]
+        col.markdown(
+            f"""<div class="metric-card" style="text-align:center; padding:0.6rem;">
+                <div style="font-size:1.1rem; color:{colors_list[i]}; font-weight:700;">{note}</div>
+            </div>""",
+            unsafe_allow_html=True,
+        )
 
 
 # ==============================================================================
@@ -647,7 +704,7 @@ def main():
         render_dashboard_page()
     elif page == "🛡️ Security Guide":
         render_security_page()
-    elif page == "ℹ️ About AI":
+    elif page == "ℹ️ About":
         render_about_page()
 
 
