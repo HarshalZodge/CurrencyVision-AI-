@@ -1,6 +1,6 @@
 """
 Plots Module for CurrencyVision AI.
-Plotly 7.x compatible — uses title=dict(text, font) syntax for axes.
+Light Aesthetic theme — crisp typography, high contrast, Plotly 7.x compatible.
 """
 
 from typing import List, Dict, Tuple
@@ -8,35 +8,22 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 
-# ── Design Tokens ──────────────────────────────────────────────────────────
-_FONT    = "Sora, Inter, sans-serif"
+# ── Design Tokens for Light Aesthetic ──────────────────────────────────────
+_FONT    = "Sora, Inter, -apple-system, sans-serif"
 _BG      = "rgba(0,0,0,0)"
-_GRID    = "rgba(255,255,255,0.05)"
-_TEXT    = "#EDF2FF"
-_MUTED   = "#8B9CC8"
-_VIOLET  = "#8B5CF6"
-_INDIGO  = "#6366F1"
-_EMERALD = "#10B981"
-_AMBER   = "#F59E0B"
-_ROSE    = "#F43F5E"
-_TEAL    = "#14B8A6"
-_SLATE   = "#334155"
-
-
-def _axis(title_text: str = "") -> dict:
-    """Returns a standard axis dict compatible with Plotly 7.x."""
-    d = dict(
-        gridcolor=_GRID,
-        tickfont=dict(color=_MUTED, size=11),
-        zeroline=False,
-    )
-    if title_text:
-        d["title"] = dict(text=title_text, font=dict(color=_MUTED, size=12))
-    return d
+_GRID    = "rgba(15, 23, 42, 0.06)"
+_TEXT    = "#0F172A"       # Deep charcoal for headings/labels
+_MUTED   = "#64748B"       # Refined slate for subtitles/axis marks
+_INDIGO  = "#4F46E5"       # Primary vibrant indigo
+_VIOLET  = "#7C3AED"       # Accent violet
+_EMERALD = "#059669"       # Success green
+_AMBER   = "#D97706"       # Warning amber
+_ROSE    = "#E11D48"       # Error / low confidence rose
+_SLATE_LIGHT = "#E2E8F0"   # Subtle bar fill
 
 
 def _base_layout(height: int = 300, margin: dict = None) -> dict:
-    """Returns base Plotly layout dict — Plotly 7.x safe."""
+    """Returns base Plotly layout dict with light aesthetic styling."""
     return dict(
         paper_bgcolor=_BG,
         plot_bgcolor=_BG,
@@ -45,8 +32,8 @@ def _base_layout(height: int = 300, margin: dict = None) -> dict:
         margin=margin or dict(l=20, r=20, t=50, b=20),
         legend=dict(
             font=dict(color=_TEXT, size=12),
-            bgcolor="rgba(13,17,23,0.70)",
-            bordercolor="rgba(255,255,255,0.08)",
+            bgcolor="rgba(255, 255, 255, 0.90)",
+            bordercolor="rgba(226, 232, 240, 0.9)",
             borderwidth=1,
         ),
     )
@@ -54,29 +41,36 @@ def _base_layout(height: int = 300, margin: dict = None) -> dict:
 
 # ─── Confidence Gauge ──────────────────────────────────────────────────────
 def plot_confidence_gauge(confidence_pct: float, denomination: str) -> go.Figure:
-    """Circular gauge for prediction confidence. Color shifts by score level."""
+    """Circular gauge for prediction confidence score in light aesthetic."""
 
     bar_color = _EMERALD if confidence_pct >= 80 else (_AMBER if confidence_pct >= 50 else _ROSE)
 
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=confidence_pct,
-        number={"suffix": "%", "font": {"size": 44, "color": bar_color, "family": _FONT}},
-        title={"text": f"<b>₹{denomination}</b>", "font": {"size": 20, "color": _TEXT, "family": _FONT}},
+        number={
+            "suffix": "%",
+            "font": {"size": 44, "color": bar_color, "family": _FONT},
+        },
+        title={
+            "text": f"<b>₹{denomination}</b>",
+            "font": {"size": 20, "color": _TEXT, "family": _FONT},
+        },
         gauge={
             "axis": {
                 "range": [0, 100],
                 "tickwidth": 1,
-                "tickcolor": "rgba(255,255,255,0.15)",
+                "tickcolor": "rgba(15, 23, 42, 0.2)",
                 "tickfont": {"color": _MUTED, "size": 10},
             },
             "bar": {"color": bar_color, "thickness": 0.22},
-            "bgcolor": "rgba(22,27,39,0.60)",
-            "borderwidth": 0,
+            "bgcolor": "rgba(241, 245, 249, 0.95)",
+            "borderwidth": 1,
+            "bordercolor": "rgba(226, 232, 240, 0.9)",
             "steps": [
-                {"range": [0, 50],   "color": "rgba(244,63,94,0.10)"},
-                {"range": [50, 80],  "color": "rgba(245,158,11,0.10)"},
-                {"range": [80, 100], "color": "rgba(16,185,129,0.12)"},
+                {"range": [0, 50],   "color": "rgba(254, 226, 226, 0.6)"},
+                {"range": [50, 80],  "color": "rgba(254, 243, 199, 0.6)"},
+                {"range": [80, 100], "color": "rgba(209, 250, 229, 0.6)"},
             ],
             "threshold": {
                 "line": {"color": bar_color, "width": 3},
@@ -92,22 +86,28 @@ def plot_confidence_gauge(confidence_pct: float, denomination: str) -> go.Figure
 
 # ─── Top Predictions Bar Chart ─────────────────────────────────────────────
 def plot_top_predictions(predictions: List[Tuple[str, float]]) -> go.Figure:
-    """Horizontal bar chart for top class probabilities."""
+    """Horizontal bar chart for top class probabilities in light aesthetic."""
 
     sorted_preds = sorted(predictions, key=lambda x: x[1])
     labels  = [f"₹{item[0]}" for item in sorted_preds]
     scores  = [item[1] for item in sorted_preds]
     n       = len(scores)
-    colors  = [_VIOLET if i == n - 1 else (_INDIGO if i == n - 2 else _SLATE) for i in range(n)]
+
+    colors  = [
+        _INDIGO if i == n - 1 else ("#818CF8" if i == n - 2 else _SLATE_LIGHT)
+        for i in range(n)
+    ]
 
     fig = go.Figure(go.Bar(
         x=scores, y=labels, orientation="h",
         text=[f"{s:.1f}%" for s in scores],
         textposition="outside",
         textfont=dict(color=_TEXT, size=12, family=_FONT),
-        marker=dict(color=colors, opacity=0.90,
-                    line=dict(color="rgba(255,255,255,0.06)", width=1),
-                    cornerradius=6),
+        marker=dict(
+            color=colors,
+            line=dict(color="rgba(15, 23, 42, 0.08)", width=1),
+            cornerradius=6,
+        ),
     ))
 
     fig.update_layout(
@@ -134,10 +134,10 @@ def plot_training_history(history_dict: Dict[str, List[float]]) -> go.Figure:
     fig    = go.Figure()
 
     cfg = [
-        ("accuracy",     "Train Accuracy", _INDIGO, "solid"),
-        ("val_accuracy", "Val Accuracy",   _TEAL,   "dash"),
-        ("loss",         "Train Loss",     _ROSE,   "solid"),
-        ("val_loss",     "Val Loss",       _AMBER,  "dot"),
+        ("accuracy",     "Train Accuracy", _INDIGO,  "solid"),
+        ("val_accuracy", "Val Accuracy",   _EMERALD, "dash"),
+        ("loss",         "Train Loss",     _ROSE,    "solid"),
+        ("val_loss",     "Val Loss",       _AMBER,   "dot"),
     ]
 
     for key, name, color, dash in cfg:
@@ -147,7 +147,7 @@ def plot_training_history(history_dict: Dict[str, List[float]]) -> go.Figure:
                 mode="lines+markers", name=name,
                 line=dict(color=color, width=2.5, dash=dash),
                 marker=dict(size=6, color=color,
-                            line=dict(color="rgba(255,255,255,0.2)", width=1)),
+                            line=dict(color="#FFFFFF", width=1.5)),
             ))
 
     fig.update_layout(
@@ -174,7 +174,7 @@ def plot_training_history(history_dict: Dict[str, List[float]]) -> go.Figure:
 def plot_confusion_matrix_heatmap(
     cm_matrix: List[List[int]], class_labels: List[str]
 ) -> go.Figure:
-    """Interactive confusion matrix heatmap."""
+    """Interactive confusion matrix heatmap styled for light aesthetic."""
 
     labels = [f"₹{c}" for c in class_labels]
 
@@ -182,10 +182,11 @@ def plot_confusion_matrix_heatmap(
         np.array(cm_matrix),
         x=labels, y=labels,
         color_continuous_scale=[
-            [0.0,  "rgba(22,27,39,1)"],
-            [0.25, "rgba(99,102,241,0.4)"],
-            [0.60, "rgba(139,92,246,0.75)"],
-            [1.0,  "rgba(167,139,250,1)"],
+            [0.0,  "#F8FAFC"],
+            [0.2,  "#EEF2FF"],
+            [0.5,  "#C7D2FE"],
+            [0.8,  "#818CF8"],
+            [1.0,  "#4F46E5"],
         ],
         labels=dict(x="Predicted", y="Actual", color="Count"),
         text_auto=True,

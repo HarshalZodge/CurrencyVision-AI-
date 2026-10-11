@@ -1,57 +1,60 @@
 /* ============================================================
-   CurrencyVision AI — Premium Dark UI
+   CurrencyVision AI — Premium Light Aesthetic Theme
    Designer: Harshal Zodge
-   Theme: Deep Space Glass + Violet Accent
+   Design Language: Modern Apple macOS / Linear Clean Light
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-/* ─── Design Tokens ─────────────────────────────────────── */
+/* ─── Light Aesthetic Design Tokens ───────────────────────── */
 :root {
-    --bg-base:        #07090F;
-    --bg-surface:     #0D1117;
-    --bg-elevated:    #161B27;
-    --bg-card:        rgba(22, 27, 39, 0.70);
-    --bg-card-hover:  rgba(30, 38, 55, 0.88);
+    --bg-base:        #F8FAFC;
+    --bg-surface:     #FFFFFF;
+    --bg-elevated:    #F1F5F9;
+    --bg-card:        rgba(255, 255, 255, 0.88);
+    --bg-card-hover:  rgba(255, 255, 255, 0.98);
 
-    --border:         rgba(255, 255, 255, 0.07);
-    --border-accent:  rgba(139, 92, 246, 0.45);
+    --border:         rgba(226, 232, 240, 0.85);
+    --border-subtle:  rgba(241, 245, 249, 0.9);
+    --border-accent:  rgba(99, 102, 241, 0.35);
 
-    --text-primary:   #EDF2FF;
-    --text-secondary: #8B9CC8;
-    --text-muted:     #4A5568;
+    --text-primary:   #0F172A;   /* Slate 900 */
+    --text-secondary: #475569;   /* Slate 600 */
+    --text-muted:     #94A3B8;   /* Slate 400 */
 
-    --violet:         #8B5CF6;
-    --violet-light:   #A78BFA;
-    --indigo:         #6366F1;
-    --pink:           #EC4899;
-    --teal:           #14B8A6;
-    --emerald:        #10B981;
-    --amber:          #F59E0B;
+    --indigo:         #4F46E5;
+    --indigo-light:   #6366F1;
+    --indigo-subtle:  #EEF2FF;
+    --violet:         #7C3AED;
+    --emerald:        #059669;
+    --emerald-subtle: #ECFDF5;
+    --amber:          #D97706;
+    --rose:           #E11D48;
+    --cyan:           #0891B2;
 
-    --glow-violet:    rgba(139, 92, 246, 0.30);
-    --glow-indigo:    rgba(99, 102, 241, 0.25);
-    --glow-pink:      rgba(236, 72, 153, 0.20);
+    --glow-indigo:    rgba(79, 70, 229, 0.20);
+    --glow-card:      0 16px 36px -6px rgba(15, 23, 42, 0.08);
 
     --radius-sm:      10px;
     --radius-md:      16px;
-    --radius-lg:      24px;
-    --radius-xl:      32px;
+    --radius-lg:      22px;
+    --radius-xl:      28px;
 
-    --font-heading:   'Sora', sans-serif;
+    --font-heading:   'Sora', 'Plus Jakarta Sans', sans-serif;
     --font-body:      'Inter', sans-serif;
 
-    --shadow-sm:   0 2px 8px rgba(0,0,0,0.30);
-    --shadow-md:   0 8px 30px rgba(0,0,0,0.40);
-    --shadow-lg:   0 20px 60px rgba(0,0,0,0.50);
+    --shadow-xs:      0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-sm:      0 2px 8px -1px rgba(15, 23, 42, 0.05);
+    --shadow-md:      0 8px 24px -4px rgba(15, 23, 42, 0.07);
+    --shadow-lg:      0 20px 48px -10px rgba(15, 23, 42, 0.10);
 }
 
-/* ─── Global App Background ─────────────────────────────── */
+/* ─── Global App Background ───────────────────────────────── */
 .stApp {
     background:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.18) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 95% 90%, rgba(139,92,246,0.12) 0%, transparent 55%),
-        radial-gradient(ellipse 40% 40% at 5% 80%, rgba(20,184,166,0.08) 0%, transparent 55%),
+        radial-gradient(110% 70% at 50% -10%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+        radial-gradient(80% 50% at 100% 100%, rgba(236, 72, 153, 0.04) 0%, transparent 60%),
+        radial-gradient(60% 40% at 0% 90%, rgba(20, 184, 166, 0.04) 0%, transparent 50%),
         var(--bg-base);
     background-attachment: fixed;
     font-family: var(--font-body);
@@ -63,100 +66,167 @@
     font-family: var(--font-body);
 }
 
-/* ─── Sidebar ─────────────────────────────────────────────── */
+/* ─── Redesigned Aesthetic Sidebar ────────────────────────── */
 section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg,
-        rgba(13,17,23,0.98) 0%,
-        rgba(10,13,20,0.99) 100%) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(24px);
-    border-right: 1px solid var(--border);
-    box-shadow: 4px 0 40px rgba(0,0,0,0.5);
+    -webkit-backdrop-filter: blur(24px);
+    border-right: 1px solid var(--border) !important;
+    box-shadow: 4px 0 28px rgba(15, 23, 42, 0.04) !important;
 }
 
-section[data-testid="stSidebar"] .stRadio label {
+section[data-testid="stSidebar"] .block-container {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
+}
+
+/* Sidebar Brand Header Card */
+.sidebar-brand-card {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-brand-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--indigo), var(--violet), #EC4899);
+}
+
+/* ─── Redesigned Navigation Menu (Interactive Segmented Pills) */
+section[data-testid="stSidebar"] div[data-testid="stRadio"] {
+    margin-top: 0.5rem;
+}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] > label {
+    display: none !important; /* Hide redundant "Navigation" text header */
+}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] {
+    gap: 6px !important;
+    padding: 4px !important;
+    background: #F1F5F9;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0.62rem 0.95rem !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
     color: var(--text-secondary) !important;
-    font-size: 0.93rem !important;
+    font-size: 0.90rem !important;
     font-weight: 500 !important;
-    padding: 0.3rem 0 !important;
-    transition: color 0.2s ease;
-}
-section[data-testid="stSidebar"] .stRadio label:hover {
-    color: var(--text-primary) !important;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+    margin: 0 !important;
+    width: 100% !important;
 }
 
-/* ─── Hero Section ───────────────────────────────────────── */
+/* Hide native circular radio dot */
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label > div:first-child {
+    display: none !important;
+}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+    transform: translateX(2px) !important;
+}
+
+/* Active Selected Navigation Pill */
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked),
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label[data-checked="true"] {
+    background: linear-gradient(135deg, var(--indigo) 0%, var(--indigo-light) 100%) !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+    border-color: #4338CA !important;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.30) !important;
+    transform: none !important;
+}
+
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) p,
+section[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) span {
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+}
+
+/* ─── Hero Section (Clean Radiant Light Glass) ────────────── */
 .hero-container {
-    padding: 4rem 2.5rem 3.5rem;
+    padding: 3.5rem 2.2rem 3rem;
     border-radius: var(--radius-xl);
     background:
         linear-gradient(135deg,
-            rgba(99,102,241,0.10) 0%,
-            rgba(139,92,246,0.06) 50%,
-            rgba(236,72,153,0.04) 100%),
-        var(--bg-card);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid var(--border-accent);
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(248, 250, 252, 0.90) 50%,
+            rgba(238, 242, 255, 0.65) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
     box-shadow:
-        0 0 0 1px rgba(139,92,246,0.08),
-        0 30px 80px rgba(0,0,0,0.50),
-        inset 0 1px 0 rgba(255,255,255,0.05);
+        0 1px 0 rgba(255, 255, 255, 0.9) inset,
+        0 20px 40px -15px rgba(15, 23, 42, 0.06),
+        0 0 0 1px rgba(99, 102, 241, 0.05);
     text-align: center;
     margin-bottom: 2rem;
     position: relative;
     overflow: hidden;
 }
 
-/* Subtle grid texture overlay */
 .hero-container::before {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 28px 28px;
+    background-image: radial-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
     pointer-events: none;
 }
 
 .hero-title {
     font-family: var(--font-heading);
-    font-size: 3.0rem;
+    font-size: 2.9rem;
     font-weight: 800;
     letter-spacing: -0.04em;
-    line-height: 1.15;
-    background: linear-gradient(140deg,
-        #FFFFFF 0%,
-        #C4B5FD 40%,
-        #A78BFA 70%,
-        #8B5CF6 100%);
+    line-height: 1.18;
+    background: linear-gradient(135deg, #0F172A 0%, #312E81 45%, #4F46E5 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 1rem;
+    margin-bottom: 0.9rem;
 }
 
 .hero-subtitle {
     font-size: 1.1rem;
     color: var(--text-secondary);
-    max-width: 600px;
+    max-width: 620px;
     margin: 0 auto;
     line-height: 1.7;
     font-weight: 400;
 }
 
-/* ─── Metric Cards ───────────────────────────────────────── */
+/* ─── Metric & Feature Cards ──────────────────────────────── */
 .metric-card {
-    background: var(--bg-card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: 1.4rem 1.2rem;
+    padding: 1.35rem 1.15rem;
     text-align: center;
     transition:
-        transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
-        box-shadow 0.28s ease,
-        border-color 0.28s ease,
-        background 0.28s ease;
+        transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
     box-shadow: var(--shadow-sm);
     position: relative;
     overflow: hidden;
@@ -166,21 +236,16 @@ section[data-testid="stSidebar"] .stRadio label:hover {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg,
-        transparent,
-        rgba(255,255,255,0.12),
-        transparent);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
 }
 
 .metric-card:hover {
-    transform: translateY(-6px);
-    background: var(--bg-card-hover);
-    border-color: rgba(139,92,246,0.35);
+    transform: translateY(-4px);
+    border-color: var(--border-accent);
     box-shadow:
-        0 0 0 1px rgba(139,92,246,0.15),
-        0 20px 50px rgba(0,0,0,0.40),
-        0 0 40px var(--glow-violet);
+        0 14px 30px -6px rgba(79, 70, 229, 0.12),
+        0 4px 12px -2px rgba(15, 23, 42, 0.04);
 }
 
 .metric-value {
@@ -188,175 +253,197 @@ section[data-testid="stSidebar"] .stRadio label:hover {
     font-size: 2.0rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin-top: 0.4rem;
+    margin-top: 0.35rem;
     letter-spacing: -0.02em;
 }
 
 .metric-label {
     font-size: 0.78rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--text-muted);
 }
 
-/* ─── AI Insights Card ───────────────────────────────────── */
+/* ─── AI Insights Card (Soft Porcelain / Lavender Glass) ─── */
 .insights-card {
-    background: linear-gradient(135deg,
-        rgba(99,102,241,0.09) 0%,
-        rgba(139,92,246,0.06) 100%);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(139,92,246,0.22);
+    background: linear-gradient(135deg, rgba(238, 242, 255, 0.85) 0%, rgba(245, 243, 255, 0.70) 100%);
+    border: 1px solid rgba(199, 210, 254, 0.85);
     border-radius: var(--radius-md);
-    padding: 1.6rem;
+    padding: 1.5rem;
     margin-top: 1.5rem;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-primary);
 }
 
 .insights-header {
     font-family: var(--font-heading);
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--violet-light);
-    margin-bottom: 1rem;
+    color: var(--indigo);
+    margin-bottom: 0.9rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-/* ─── Buttons ────────────────────────────────────────────── */
+/* ─── Primary Buttons ─────────────────────────────────────── */
 .stButton > button {
-    background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%);
+    background: linear-gradient(135deg, var(--indigo) 0%, var(--indigo-light) 100%) !important;
     color: #FFFFFF !important;
     font-family: var(--font-body);
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.93rem;
     border-radius: var(--radius-sm);
     border: none;
-    padding: 0.65rem 1.6rem;
-    box-shadow: 0 4px 20px var(--glow-indigo);
-    transition: all 0.25s ease;
+    padding: 0.65rem 1.5rem;
+    box-shadow: 0 4px 14px var(--glow-indigo);
+    transition: all 0.22s ease;
     letter-spacing: 0.01em;
 }
 
 .stButton > button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 28px var(--glow-violet);
-    background: linear-gradient(135deg, #6366F1 0%, #A78BFA 100%);
+    box-shadow: 0 8px 22px rgba(79, 70, 229, 0.35);
+    background: linear-gradient(135deg, #4338CA 0%, #4F46E5 100%) !important;
 }
 
-/* Download buttons */
+/* ─── Download Buttons (Pristine Light Outline) ───────────── */
 .stDownloadButton > button {
-    background: rgba(22, 27, 39, 0.8) !important;
-    color: var(--violet-light) !important;
-    border: 1px solid rgba(139,92,246,0.35) !important;
+    background: #FFFFFF !important;
+    color: var(--indigo) !important;
+    border: 1px solid var(--border) !important;
     border-radius: var(--radius-sm) !important;
     font-weight: 600 !important;
     font-size: 0.88rem !important;
-    transition: all 0.25s ease !important;
+    box-shadow: var(--shadow-xs) !important;
+    transition: all 0.22s ease !important;
 }
 
 .stDownloadButton > button:hover {
-    background: rgba(139,92,246,0.15) !important;
-    border-color: var(--violet) !important;
+    background: var(--indigo-subtle) !important;
+    border-color: var(--indigo-light) !important;
+    color: #312E81 !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 6px 20px var(--glow-violet) !important;
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.14) !important;
 }
 
-/* ─── File Uploader ──────────────────────────────────────── */
+/* ─── File Uploader ───────────────────────────────────────── */
 [data-testid="stFileUploader"] {
-    background: var(--bg-elevated) !important;
-    border: 2px dashed rgba(139,92,246,0.30) !important;
+    background: #FFFFFF !important;
+    border: 2px dashed rgba(99, 102, 241, 0.35) !important;
     border-radius: var(--radius-md) !important;
-    padding: 1rem !important;
-    transition: border-color 0.3s ease !important;
+    padding: 1.2rem !important;
+    box-shadow: var(--shadow-xs) !important;
+    transition: all 0.25s ease !important;
 }
 
 [data-testid="stFileUploader"]:hover {
-    border-color: var(--violet) !important;
+    border-color: var(--indigo) !important;
+    background: #F8FAFC !important;
 }
 
-/* ─── Progress Bar ───────────────────────────────────────── */
+/* ─── Progress Bar ────────────────────────────────────────── */
 .stProgress > div > div > div > div {
-    background: linear-gradient(90deg, var(--indigo), var(--violet), var(--pink));
+    background: linear-gradient(90deg, var(--indigo), var(--violet), #EC4899);
     border-radius: 100px;
 }
 
-/* ─── Dataframe / Table ──────────────────────────────────── */
+/* ─── Dataframe / Table ───────────────────────────────────── */
 .stDataFrame {
     border: 1px solid var(--border) !important;
     border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-xs) !important;
     overflow: hidden !important;
+    background: #FFFFFF !important;
 }
 
-/* ─── Alerts / Info / Success ────────────────────────────── */
+/* ─── Alert Boxes (Info, Success, Warning) ────────────────── */
 .stAlert {
     border-radius: var(--radius-md) !important;
-    border: none !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow-xs) !important;
 }
 
-/* ─── Hide Streamlit Defaults ────────────────────────────── */
-#MainMenu   { visibility: hidden; }
-footer      { visibility: hidden; }
-header      { visibility: hidden; }
-.stDeployButton { display: none; }
-
-/* ─── Scrollbar ──────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--indigo), var(--violet));
-    border-radius: 100px;
-}
-::-webkit-scrollbar-thumb:hover { background: var(--violet-light); }
-
-/* ─── Typography Helpers ─────────────────────────────────── */
-h1, h2, h3 {
+/* ─── Typography & Paragraphs ─────────────────────────────── */
+h1, h2, h3, h4 {
     font-family: var(--font-heading);
     letter-spacing: -0.02em;
     color: var(--text-primary);
 }
 
-.stMarkdown p { color: var(--text-secondary); line-height: 1.75; }
+.stMarkdown p {
+    color: var(--text-secondary);
+    line-height: 1.72;
+}
 
-/* ─── Input / Select Widgets ─────────────────────────────── */
+/* ─── Input & Select Elements ─────────────────────────────── */
 .stSelectbox > div > div,
 .stTextInput > div > div > input {
-    background: var(--bg-elevated) !important;
+    background: #FFFFFF !important;
     border: 1px solid var(--border) !important;
     border-radius: var(--radius-sm) !important;
     color: var(--text-primary) !important;
+    box-shadow: var(--shadow-xs) !important;
 }
 
-/* ─── Radio Buttons ──────────────────────────────────────── */
-.stRadio > div {
-    gap: 0.5rem;
+.stSelectbox > div > div:hover,
+.stTextInput > div > div > input:focus {
+    border-color: var(--indigo) !important;
 }
-.stRadio label {
-    background: var(--bg-elevated);
+
+/* ─── Radio Pills inside Main Page ────────────────────────── */
+.main .stRadio > div {
+    gap: 0.6rem;
+}
+
+.main .stRadio label {
+    background: #FFFFFF;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding: 0.4rem 1rem;
+    padding: 0.45rem 1rem;
+    box-shadow: var(--shadow-xs);
     transition: all 0.2s ease;
     cursor: pointer;
 }
-.stRadio label:hover {
-    border-color: var(--border-accent);
-    background: rgba(139,92,246,0.08);
+
+.main .stRadio label:hover {
+    border-color: var(--indigo-light);
+    background: var(--indigo-subtle);
 }
 
-/* ─── Divider ────────────────────────────────────────────── */
+/* ─── Divider ─────────────────────────────────────────────── */
 hr {
     border: none;
     border-top: 1px solid var(--border);
     margin: 1.5rem 0;
 }
 
-/* ─── Plotly Chart Container ─────────────────────────────── */
+/* ─── Plotly Container ────────────────────────────────────── */
 .js-plotly-plot {
     border-radius: var(--radius-md);
-    overflow: hidden;
+    background: #FFFFFF !important;
+    border: 1px solid var(--border);
+    padding: 0.5rem;
+    box-shadow: var(--shadow-xs);
 }
 
-/* ─── Caption / Small Text ───────────────────────────────── */
-.stCaption { color: var(--text-muted) !important; font-size: 0.82rem !important; }
+/* ─── Hide Streamlit Branding Defaults ────────────────────── */
+#MainMenu   { visibility: hidden; }
+footer      { visibility: hidden; }
+header      { visibility: hidden; }
+.stDeployButton { display: none; }
+
+/* ─── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 100px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--indigo-light); }
+
+.stCaption {
+    color: var(--text-muted) !important;
+    font-size: 0.84rem !important;
+}

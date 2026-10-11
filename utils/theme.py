@@ -1,7 +1,6 @@
 """
 Theme Manager Module for CurrencyVision AI.
-Controls dark and light mode state switching and injects Apple + OpenAI
-glassmorphic theme styles into Streamlit.
+Controls theme state switching and injects light aesthetic styles into Streamlit.
 """
 
 import os
@@ -9,17 +8,17 @@ import streamlit as st
 
 
 def init_theme_session_state() -> None:
-    """Initializes default theme setting in Streamlit session state if not set."""
+    """Initializes default theme setting in Streamlit session state (Default: light)."""
     if "theme_mode" not in st.session_state:
-        st.session_state["theme_mode"] = "dark"
+        st.session_state["theme_mode"] = "light"
 
 
 def toggle_theme() -> None:
-    """Toggles current theme between dark and light mode."""
-    if st.session_state.get("theme_mode") == "dark":
-        st.session_state["theme_mode"] = "light"
-    else:
+    """Toggles current theme between light and dark mode."""
+    if st.session_state.get("theme_mode") == "light":
         st.session_state["theme_mode"] = "dark"
+    else:
+        st.session_state["theme_mode"] = "light"
 
 
 def load_custom_css(css_filepath: str = "styles/custom.css") -> None:
@@ -36,7 +35,6 @@ def load_custom_css(css_filepath: str = "styles/custom.css") -> None:
         with open(css_filepath, "r", encoding="utf-8") as f:
             css_code = f.read()
 
-        # Inject mode attribute tag wrapper
         theme_wrapper = f"""
         <style>
         :root {{
@@ -52,11 +50,17 @@ def load_custom_css(css_filepath: str = "styles/custom.css") -> None:
 
 def render_theme_toggle_button() -> None:
     """Renders a sleek theme toggle button in Streamlit sidebar."""
-    mode = st.session_state.get("theme_mode", "dark")
-    icon = "☀️ Light Mode" if mode == "dark" else "🌙 Dark Mode"
+    mode = st.session_state.get("theme_mode", "light")
+    icon = "🌙 Dark Mode" if mode == "light" else "☀️ Light Aesthetic"
 
-    st.sidebar.markdown("---")
-    st.sidebar.caption("🎨 UI Personalization")
+    st.sidebar.markdown(
+        """
+        <div style="margin: 0.8rem 0 0.4rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94A3B8;">
+            Appearance
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     if st.sidebar.button(icon, key="theme_toggle_btn", use_container_width=True):
         toggle_theme()
         st.rerun()

@@ -62,19 +62,43 @@ init_session_history()
 
 
 def render_sidebar_navigation() -> str:
-    """Renders sleek Apple/OpenAI styled sidebar with branding & page selection."""
+    """Renders sleek Apple/Linear styled sidebar with branding & interactive navigation menu."""
+    
+    # 1. Sleek Brand Header with Emblem + Pulsing Status
     st.sidebar.markdown(
         """
-        <div style="text-align: center; padding: 1rem 0;">
-            <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; margin: 0; background: linear-gradient(135deg, #818CF8, #C084FC); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                💰 CurrencyVision AI
-            </h2>
-            <p style="font-size: 0.8rem; color: #94A3B8; margin-top: 4px;">Indian Banknote Recognition</p>
+        <div class="sidebar-brand-card">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px;">
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #4F46E5, #7C3AED); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.28);">
+                    💰
+                </div>
+                <div style="text-align: left;">
+                    <div style="font-family: 'Sora', sans-serif; font-size: 1.22rem; font-weight: 800; color: #0F172A; letter-spacing: -0.02em; line-height: 1.1;">
+                        CurrencyVision
+                    </div>
+                    <div style="font-size: 0.70rem; font-weight: 700; color: #4F46E5; letter-spacing: 0.06em; text-transform: uppercase;">
+                        Neural Vision AI
+                    </div>
+                </div>
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 999px; margin-top: 4px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #059669; display: inline-block;"></span>
+                <span style="font-size: 0.72rem; font-weight: 600; color: #047857;">Engine v2.0 • Active</span>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.sidebar.markdown("---")
+
+    # 2. Section Header
+    st.sidebar.markdown(
+        """
+        <div style="margin: 0.8rem 0 0.35rem 0.2rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94A3B8;">
+            Navigation Menu
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     nav_options = [
         "🏠 Home",
@@ -88,26 +112,50 @@ def render_sidebar_navigation() -> str:
         st.session_state["nav_page"] = "🏠 Home"
 
     page = st.sidebar.radio(
-        "Navigation",
+        "Navigation Menu",
         nav_options,
         key="nav_page"
     )
 
+    # 3. Live Session Scan Activity Card
+    scan_count = len(st.session_state.get("prediction_history", []))
+    st.sidebar.markdown(
+        f"""
+        <div style="margin-top: 1.2rem; padding: 0.85rem 1rem; border-radius: 14px; background: #FFFFFF; border: 1px solid rgba(226, 232, 240, 0.9); box-shadow: 0 1px 3px rgba(15,23,42,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.8rem; font-weight: 600; color: #64748B;">⚡ Session Scans</span>
+                <span style="font-size: 0.95rem; font-weight: 800; color: #4F46E5; background: #EEF2FF; padding: 2px 8px; border-radius: 8px;">{scan_count}</span>
+            </div>
+            <div style="font-size: 0.73rem; color: #94A3B8; margin-top: 4px;">Real-time inference history active</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 4. Appearance Toggle
     render_theme_toggle_button()
 
-    # Live session scan counter
-    scan_count = len(st.session_state.get("prediction_history", []))
-    if scan_count > 0:
-        st.sidebar.markdown(
-            f"""<div style="text-align:center; margin-top:0.5rem; padding:0.5rem; border-radius:8px; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3);">
-                <span style="font-size:0.85rem; color:#818CF8;">🔍 Notes scanned: <b>{scan_count}</b></span>
-            </div>""",
-            unsafe_allow_html=True,
-        )
-
-    st.sidebar.markdown("---")
+    # 5. Creator Profile Card in Sidebar Footer
     st.sidebar.markdown(
-        "<div style='text-align:center; font-size:0.78rem; color:#64748B;'>Built by <b style='color:#818CF8;'>Harshal Zodge</b><br/>© 2026 CurrencyVision AI</div>",
+        """
+        <div style="margin-top: 1.2rem; padding: 0.9rem; border-radius: 14px; background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%); border: 1px solid rgba(226, 232, 240, 0.9); text-align: center; box-shadow: 0 1px 3px rgba(15,23,42,0.03);">
+            <div style="font-size: 0.74rem; color: #64748B; font-weight: 500;">Designed & Developed by</div>
+            <div style="font-family: 'Sora', sans-serif; font-size: 0.96rem; font-weight: 700; color: #0F172A; margin: 2px 0 6px;">
+                Harshal Zodge
+            </div>
+            <div style="display: flex; justify-content: center; gap: 8px;">
+                <a href="https://github.com/HarshalZodge" target="_blank" style="text-decoration: none; font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; background: #F1F5F9; color: #334155; font-weight: 600; border: 1px solid #E2E8F0;">
+                    🐙 GitHub
+                </a>
+                <a href="https://www.linkedin.com/in/harshal-zodge" target="_blank" style="text-decoration: none; font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; background: #EEF2FF; color: #4F46E5; font-weight: 600; border: 1px solid #C7D2FE;">
+                    💼 LinkedIn
+                </a>
+            </div>
+            <div style="font-size: 0.70rem; color: #94A3B8; margin-top: 8px;">
+                © 2026 CurrencyVision AI
+            </div>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
     return page
@@ -371,15 +419,15 @@ def render_predict_page():
 
             st.markdown(
                 f"""
-                <div class="metric-card" style="border-left: 6px solid #4F46E5; text-align: left;">
-                    <div style="font-size: 0.9rem; color: #94A3B8;">DETECTED DENOMINATION</div>
-                    <div style="font-family: 'Outfit'; font-size: 2.8rem; font-weight: 800; color: #10B981;">
+                <div class="metric-card" style="border-left: 6px solid #4F46E5; text-align: left; padding: 1.4rem;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; letter-spacing: 0.08em; text-transform: uppercase;">DETECTED DENOMINATION</div>
+                    <div style="font-family: 'Sora', sans-serif; font-size: 2.8rem; font-weight: 800; color: #059669; margin: 0.2rem 0;">
                         ₹{pred_denom}
                     </div>
-                    <div style="display: flex; gap: 15px; margin-top: 10px; font-size: 0.9rem; color: #F8FAFC;">
-                        <span>Confidence: <b>{conf_val:.2f}%</b></span>
+                    <div style="display: flex; gap: 14px; margin-top: 8px; font-size: 0.9rem; color: #475569;">
+                        <span>Confidence: <b style="color: #0F172A;">{conf_val:.2f}%</b></span>
                         <span>•</span>
-                        <span>Inference Time: <b>{inf_time:.2f} ms</b></span>
+                        <span>Inference Time: <b style="color: #0F172A;">{inf_time:.2f} ms</b></span>
                     </div>
                 </div>
                 """,
@@ -612,22 +660,24 @@ def render_about_page():
     # Creator Card
     st.markdown(
         """
-        <div class="metric-card" style="text-align:center; padding: 2rem; margin-bottom: 1.5rem;">
-            <div style="font-size: 3rem; margin-bottom: 0.5rem;">👨‍💻</div>
-            <h2 style="font-family:'Outfit'; font-size:1.8rem; margin:0; background: linear-gradient(135deg, #818CF8, #C084FC); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+        <div class="metric-card" style="text-align:center; padding: 2.5rem 2rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);">
+            <div style="width: 70px; height: 70px; margin: 0 auto 1rem; border-radius: 50%; background: linear-gradient(135deg, #EEF2FF, #E0E7FF); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 4px 16px rgba(79, 70, 229, 0.15);">
+                👨‍💻
+            </div>
+            <h2 style="font-family:'Sora', sans-serif; font-size:1.9rem; font-weight:800; margin:0; background: linear-gradient(135deg, #0F172A 0%, #312E81 50%, #4F46E5 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
                 Harshal Zodge
             </h2>
-            <p style="color:#94A3B8; font-size:1rem; margin:0.5rem 0 1rem;">
-                AI / ML Developer · Deep Learning Enthusiast
+            <p style="color:#64748B; font-size:1rem; margin:0.4rem 0 1.2rem; font-weight:500;">
+                AI & Deep Learning Developer
             </p>
             <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
                 <a href="https://github.com/HarshalZodge" target="_blank"
-                   style="background:#1E293B; color:#818CF8; padding:0.4rem 1.2rem; border-radius:6px; text-decoration:none; font-size:0.9rem; border:1px solid rgba(129,140,248,0.3);">
-                    🐙 GitHub
+                   style="background:#F1F5F9; color:#0F172A; padding:0.5rem 1.4rem; border-radius:10px; text-decoration:none; font-size:0.9rem; font-weight:600; border:1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(15,23,42,0.05);">
+                    🐙 GitHub Profile
                 </a>
                 <a href="https://www.linkedin.com/in/harshal-zodge" target="_blank"
-                   style="background:#1E293B; color:#34D399; padding:0.4rem 1.2rem; border-radius:6px; text-decoration:none; font-size:0.9rem; border:1px solid rgba(52,211,153,0.3);">
-                    💼 LinkedIn
+                   style="background:#EEF2FF; color:#4338CA; padding:0.5rem 1.4rem; border-radius:10px; text-decoration:none; font-size:0.9rem; font-weight:600; border:1px solid #C7D2FE; box-shadow: 0 1px 3px rgba(79,70,229,0.08);">
+                    💼 LinkedIn Profile
                 </a>
             </div>
         </div>
