@@ -232,10 +232,10 @@ def render_home_page():
 
             c1, c2 = st.columns([1, 1])
             with c1:
-                st.image(input_image, caption="Uploaded Note", use_container_width=True)
+                st.image(input_image, caption="Uploaded Note", width='stretch')
             with c2:
                 fig_g = plot_confidence_gauge(res['confidence'], res['prediction'])
-                st.plotly_chart(fig_g, use_container_width=True)
+                st.plotly_chart(fig_g, width='stretch')
 
             # Fun fact about the detected note
             fact = NOTE_FACTS.get(str(res['prediction']), "")
@@ -267,7 +267,7 @@ def render_home_page():
                     file_name=f"Currency_Report_{res['prediction']}.pdf",
                     mime="application/pdf",
                     key="home_pdf_btn",
-                    use_container_width=True,
+                    width='stretch',
                 )
             with r2:
                 st.download_button(
@@ -276,7 +276,7 @@ def render_home_page():
                     file_name=f"Currency_Report_{res['prediction']}.json",
                     mime="application/json",
                     key="home_json_btn",
-                    use_container_width=True,
+                    width='stretch',
                 )
             with r3:
                 st.download_button(
@@ -285,7 +285,7 @@ def render_home_page():
                     file_name="Prediction_History.csv",
                     mime="text/csv",
                     key="home_csv_btn",
-                    use_container_width=True,
+                    width='stretch',
                 )
         except Exception as e:
             st.error(f"Error processing image: {e}")
@@ -360,7 +360,7 @@ def render_predict_page():
 
         with col_img:
             st.markdown("### 🖼️ Note Preview")
-            st.image(input_image, use_container_width=True, caption="Uploaded Currency Note")
+            st.image(input_image, width='stretch', caption="Uploaded Currency Note")
 
         with col_metrics:
             st.markdown("### 🎯 Classification Result")
@@ -387,7 +387,7 @@ def render_predict_page():
             )
 
             fig_gauge = plot_confidence_gauge(conf_val, pred_denom)
-            st.plotly_chart(fig_gauge, use_container_width=True)
+            st.plotly_chart(fig_gauge, width='stretch')
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -396,14 +396,14 @@ def render_predict_page():
 
         with c_prob:
             fig_top = plot_top_predictions(res["top_predictions"])
-            st.plotly_chart(fig_top, use_container_width=True)
+            st.plotly_chart(fig_top, width='stretch')
 
         with c_gradcam:
             st.markdown("### 👁️ Why did the AI predict this?")
             st.caption("Grad-CAM heatmap highlighting visual regions of neural attention.")
             st.image(
                 res["gradcam_overlay"],
-                use_container_width=True,
+                width='stretch',
                 caption="Grad-CAM Focus Overlay (Red/Yellow = High Focus)",
             )
 
@@ -450,7 +450,7 @@ def render_predict_page():
                 data=pdf_bytes,
                 file_name=f"Currency_Report_{pred_denom}.pdf",
                 mime="application/pdf",
-                use_container_width=True,
+                width='stretch',
             )
 
         with rep_col2:
@@ -459,7 +459,7 @@ def render_predict_page():
                 data=json_str,
                 file_name=f"Currency_Report_{pred_denom}.json",
                 mime="application/json",
-                use_container_width=True,
+                width='stretch',
             )
 
         with rep_col3:
@@ -468,7 +468,7 @@ def render_predict_page():
                 data=csv_str,
                 file_name="Prediction_History.csv",
                 mime="text/csv",
-                use_container_width=True,
+                width='stretch',
             )
 
     # Session History Table
@@ -476,7 +476,7 @@ def render_predict_page():
         st.markdown("---")
         st.markdown("### 📜 Session Scan History")
         df_hist = pd.DataFrame(st.session_state["prediction_history"])
-        st.dataframe(df_hist, use_container_width=True)
+        st.dataframe(df_hist, width='stretch')
 
 
 # ==============================================================================
@@ -542,7 +542,7 @@ def render_dashboard_page():
 
     with c_cm:
         fig_cm = plot_confusion_matrix_heatmap(dummy_cm, sample_classes)
-        st.plotly_chart(fig_cm, use_container_width=True)
+        st.plotly_chart(fig_cm, width='stretch')
 
     with c_hist:
         sample_history = {
@@ -552,7 +552,7 @@ def render_dashboard_page():
             "val_loss": [1.3, 0.85, 0.55, 0.35, 0.22, 0.16, 0.11],
         }
         fig_hist = plot_training_history(sample_history)
-        st.plotly_chart(fig_hist, use_container_width=True)
+        st.plotly_chart(fig_hist, width='stretch')
 
     st.markdown("### 📋 Per-Class Classification Report")
     report_data = {
@@ -562,7 +562,7 @@ def render_dashboard_page():
         "F1-Score": [0.97, 0.97, 0.96, 0.99, 0.95, 0.97, 1.00],
         "Support": [46, 50, 47, 50, 49, 51, 50],
     }
-    st.dataframe(pd.DataFrame(report_data), use_container_width=True)
+    st.dataframe(pd.DataFrame(report_data), width='stretch')
 
 
 # ==============================================================================
