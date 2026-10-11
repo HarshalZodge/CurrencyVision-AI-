@@ -37,7 +37,6 @@ def _base_layout(**overrides) -> dict:
             bgcolor="rgba(13,17,23,0.70)",
             bordercolor="rgba(255,255,255,0.08)",
             borderwidth=1,
-            borderpad=8,
         ),
     )
     base.update(overrides)
