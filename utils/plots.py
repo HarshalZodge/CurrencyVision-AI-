@@ -1,7 +1,6 @@
 """
 Plots Module for CurrencyVision AI.
-Provides interactive Plotly visualization components including Circular Confidence Gauge,
-Top-3 Probability Bar Chart, Training History Curves, and Confusion Matrix Heatmaps.
+Provides premium Plotly visualization components with a consistent deep-space dark theme.
 """
 
 from typing import List, Dict, Any, Tuple
@@ -9,72 +8,121 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 
+# ── Shared Design Tokens ────────────────────────────────────────────────────
+_FONT = "Sora, Inter, sans-serif"
+_PAPER_BG = "rgba(0,0,0,0)"
+_PLOT_BG  = "rgba(0,0,0,0)"
+_GRID     = "rgba(255,255,255,0.05)"
+_TEXT     = "#EDF2FF"
+_MUTED    = "#8B9CC8"
+
+_VIOLET   = "#8B5CF6"
+_INDIGO   = "#6366F1"
+_EMERALD  = "#10B981"
+_AMBER    = "#F59E0B"
+_ROSE     = "#F43F5E"
+_TEAL     = "#14B8A6"
+_SLATE    = "#334155"
+
+
+def _base_layout(**overrides) -> dict:
+    """Returns shared Plotly layout dict for consistent theming."""
+    base = dict(
+        paper_bgcolor=_PAPER_BG,
+        plot_bgcolor=_PLOT_BG,
+        font=dict(family=_FONT, color=_TEXT),
+        margin=dict(l=20, r=20, t=50, b=20),
+        legend=dict(
+            font=dict(color=_TEXT, size=12),
+            bgcolor="rgba(13,17,23,0.70)",
+            bordercolor="rgba(255,255,255,0.08)",
+            borderwidth=1,
+            borderpad=8,
+        ),
+    )
+    base.update(overrides)
+    return base
+
 
 def plot_confidence_gauge(confidence_pct: float, denomination: str) -> go.Figure:
     """
-    Creates an Apple/OpenAI styled circular gauge indicator for prediction confidence.
+    Premium circular gauge for prediction confidence score.
 
     Args:
-        confidence_pct (float): Confidence score percentage (0 - 100).
-        denomination (str): Predicted currency denomination label.
+        confidence_pct (float): Confidence score 0–100.
+        denomination (str): Predicted denomination label.
 
     Returns:
-        go.Figure: Plotly Figure gauge component.
+        go.Figure
     """
+    # Pick needle/bar color based on confidence level
+    if confidence_pct >= 80:
+        bar_color = _EMERALD
+    elif confidence_pct >= 50:
+        bar_color = _AMBER
+    else:
+        bar_color = _ROSE
+
     fig = go.Figure(
         go.Indicator(
             mode="gauge+number",
             value=confidence_pct,
-            number={"suffix": "%", "font": {"size": 42, "color": "#F8FAFC", "family": "Inter, sans-serif"}},
+            number={
+                "suffix": "%",
+                "font": {"size": 44, "color": bar_color, "family": _FONT},
+            },
             title={
-                "text": f"<b>Confidence: ₹{denomination}</b>",
-                "font": {"size": 18, "color": "#94A3B8", "family": "Inter, sans-serif"},
+                "text": f"<b>₹{denomination}</b>",
+                "font": {"size": 20, "color": _TEXT, "family": _FONT},
             },
             gauge={
-                "axis": {"range": [0, 100], "tickwidth": 1, "tickcolor": "#475569"},
-                "bar": {"color": "#4F46E5", "thickness": 0.3},
-                "bgcolor": "rgba(30, 41, 59, 0.5)",
-                "borderwidth": 2,
-                "bordercolor": "rgba(255, 255, 255, 0.1)",
+                "axis": {
+                    "range": [0, 100],
+                    "tickwidth": 1,
+                    "tickcolor": "rgba(255,255,255,0.15)",
+                    "tickfont": {"color": _MUTED, "size": 11},
+                },
+                "bar": {"color": bar_color, "thickness": 0.22},
+                "bgcolor": "rgba(22,27,39,0.60)",
+                "borderwidth": 0,
                 "steps": [
-                    {"range": [0, 40], "color": "rgba(239, 68, 68, 0.2)"},
-                    {"range": [40, 75], "color": "rgba(245, 158, 11, 0.2)"},
-                    {"range": [75, 100], "color": "rgba(16, 185, 129, 0.2)"},
+                    {"range": [0, 50],  "color": "rgba(244,63,94,0.10)"},
+                    {"range": [50, 80], "color": "rgba(245,158,11,0.10)"},
+                    {"range": [80, 100],"color": "rgba(16,185,129,0.12)"},
                 ],
                 "threshold": {
-                    "line": {"color": "#10B981", "width": 4},
-                    "thickness": 0.8,
+                    "line": {"color": bar_color, "width": 3},
+                    "thickness": 0.75,
                     "value": confidence_pct,
                 },
             },
         )
     )
-
-    fig.update_layout(
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        height=260,
-        margin=dict(l=30, r=30, t=50, b=20),
-    )
+    fig.update_layout(**_base_layout(height=270, margin=dict(l=25, r=25, t=55, b=15)))
     return fig
 
 
 def plot_top_predictions(predictions: List[Tuple[str, float]]) -> go.Figure:
     """
-    Creates a sleek horizontal probability bar chart for Top-3 predictions.
+    Horizontal bar chart for top class probabilities.
 
     Args:
-        predictions (List[Tuple[str, float]]): List of (class_label, probability_pct) tuples.
+        predictions: List of (label, probability_pct) tuples.
 
     Returns:
-        go.Figure: Plotly horizontal bar chart.
+        go.Figure
     """
-    # Sort ascending for bottom-to-top rendering
-    sorted_preds = sorted(predictions, key=lambda x: x[1], reverse=False)
+    sorted_preds = sorted(predictions, key=lambda x: x[1])
     labels = [f"₹{item[0]}" for item in sorted_preds]
     scores = [item[1] for item in sorted_preds]
 
-    colors = ["#6366F1" if i == len(scores) - 1 else "#334155" for i in range(len(scores))]
+    n = len(scores)
+    bar_colors = [
+        _VIOLET if i == n - 1
+        else _INDIGO if i == n - 2
+        else _SLATE
+        for i in range(n)
+    ]
 
     fig = go.Figure(
         go.Bar(
@@ -83,93 +131,90 @@ def plot_top_predictions(predictions: List[Tuple[str, float]]) -> go.Figure:
             orientation="h",
             text=[f"{s:.1f}%" for s in scores],
             textposition="outside",
+            textfont=dict(color=_TEXT, size=12, family=_FONT),
             marker=dict(
-                color=colors,
-                line=dict(color="rgba(255, 255, 255, 0.2)", width=1),
+                color=bar_colors,
+                opacity=0.90,
+                line=dict(color="rgba(255,255,255,0.06)", width=1),
                 cornerradius=6,
             ),
         )
     )
 
     fig.update_layout(
-        title=dict(text="<b>Top Predictions Probability</b>", font=dict(size=16, color="#F8FAFC")),
-        xaxis=dict(title="Probability (%)", range=[0, 105], gridcolor="rgba(255,255,255,0.05)"),
-        yaxis=dict(title="", tickfont=dict(size=14, color="#F8FAFC")),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        height=260,
-        margin=dict(l=20, r=40, t=50, b=20),
+        **_base_layout(height=270, margin=dict(l=20, r=55, t=50, b=20)),
+        title=dict(
+            text="<b>Top Predictions</b>",
+            font=dict(size=15, color=_TEXT, family=_FONT),
+        ),
+        xaxis=dict(
+            title="Probability (%)",
+            range=[0, 115],
+            gridcolor=_GRID,
+            tickfont=dict(color=_MUTED),
+            titlefont=dict(color=_MUTED),
+            zeroline=False,
+        ),
+        yaxis=dict(
+            tickfont=dict(size=14, color=_TEXT),
+            gridcolor="rgba(0,0,0,0)",
+        ),
+        bargap=0.35,
     )
     return fig
 
 
 def plot_training_history(history_dict: Dict[str, List[float]]) -> go.Figure:
     """
-    Generates interactive dual-panel line plot showing Training & Validation Accuracy and Loss.
+    Dual-line chart for training and validation accuracy/loss.
 
     Args:
-        history_dict (Dict[str, List[float]]): Keras model fit history dictionary.
+        history_dict: Keras-style history dict with accuracy, val_accuracy, loss, val_loss.
 
     Returns:
-        go.Figure: Plotly Figure with line subplots.
+        go.Figure
     """
     epochs = list(range(1, len(history_dict.get("accuracy", [])) + 1))
 
     fig = go.Figure()
 
-    # Accuracy Lines
-    if "accuracy" in history_dict:
-        fig.add_trace(
-            go.Scatter(
-                x=epochs,
-                y=history_dict["accuracy"],
-                mode="lines+markers",
-                name="Train Accuracy",
-                line=dict(color="#4F46E5", width=3),
-            )
-        )
-    if "val_accuracy" in history_dict:
-        fig.add_trace(
-            go.Scatter(
-                x=epochs,
-                y=history_dict["val_accuracy"],
-                mode="lines+markers",
-                name="Val Accuracy",
-                line=dict(color="#10B981", width=3, dash="dash"),
-            )
-        )
+    trace_cfg = [
+        ("accuracy",     "Train Accuracy", _INDIGO, "solid"),
+        ("val_accuracy", "Val Accuracy",   _TEAL,   "dash"),
+        ("loss",         "Train Loss",     _ROSE,   "solid"),
+        ("val_loss",     "Val Loss",       _AMBER,  "dot"),
+    ]
 
-    # Loss Lines
-    if "loss" in history_dict:
-        fig.add_trace(
-            go.Scatter(
+    for key, name, color, dash in trace_cfg:
+        if key in history_dict:
+            fig.add_trace(go.Scatter(
                 x=epochs,
-                y=history_dict["loss"],
+                y=history_dict[key],
                 mode="lines+markers",
-                name="Train Loss",
-                line=dict(color="#EF4444", width=3),
-            )
-        )
-    if "val_loss" in history_dict:
-        fig.add_trace(
-            go.Scatter(
-                x=epochs,
-                y=history_dict["val_loss"],
-                mode="lines+markers",
-                name="Val Loss",
-                line=dict(color="#F59E0B", width=3, dash="dash"),
-            )
-        )
+                name=name,
+                line=dict(color=color, width=2.5, dash=dash),
+                marker=dict(size=6, color=color, line=dict(color="rgba(255,255,255,0.2)", width=1)),
+            ))
 
     fig.update_layout(
-        title=dict(text="<b>CNN Training Performance History</b>", font=dict(size=18, color="#F8FAFC")),
-        xaxis=dict(title="Epochs", gridcolor="rgba(255,255,255,0.08)"),
-        yaxis=dict(title="Score / Loss", gridcolor="rgba(255,255,255,0.08)"),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        legend=dict(font=dict(color="#F8FAFC"), bgcolor="rgba(15, 23, 42, 0.6)"),
-        height=380,
-        margin=dict(l=30, r=30, t=50, b=30),
+        **_base_layout(height=380, margin=dict(l=30, r=30, t=55, b=30)),
+        title=dict(
+            text="<b>Training Performance</b>",
+            font=dict(size=15, color=_TEXT, family=_FONT),
+        ),
+        xaxis=dict(
+            title="Epoch",
+            gridcolor=_GRID,
+            tickfont=dict(color=_MUTED),
+            titlefont=dict(color=_MUTED),
+        ),
+        yaxis=dict(
+            title="Score",
+            gridcolor=_GRID,
+            tickfont=dict(color=_MUTED),
+            titlefont=dict(color=_MUTED),
+        ),
+        hovermode="x unified",
     )
     return fig
 
@@ -178,32 +223,40 @@ def plot_confusion_matrix_heatmap(
     cm_matrix: List[List[int]], class_labels: List[str]
 ) -> go.Figure:
     """
-    Creates an interactive Confusion Matrix Heatmap using Plotly.
+    Interactive confusion matrix heatmap.
 
     Args:
-        cm_matrix (List[List[int]]): 2D confusion matrix list/array.
-        class_labels (List[str]): List of denomination class labels.
+        cm_matrix: 2D confusion matrix.
+        class_labels: List of denomination labels.
 
     Returns:
-        go.Figure: Plotly Heatmap.
+        go.Figure
     """
-    labels_formatted = [f"₹{c}" for c in class_labels]
+    labels_fmt = [f"₹{c}" for c in class_labels]
 
     fig = px.imshow(
         np.array(cm_matrix),
-        x=labels_formatted,
-        y=labels_formatted,
-        color_continuous_scale="Viridis",
-        labels=dict(x="Predicted Denomination", y="True Denomination", color="Count"),
+        x=labels_fmt,
+        y=labels_fmt,
+        color_continuous_scale=[
+            [0.0,  "rgba(22,27,39,1)"],
+            [0.25, "rgba(99,102,241,0.4)"],
+            [0.60, "rgba(139,92,246,0.75)"],
+            [1.0,  "rgba(167,139,250,1)"],
+        ],
+        labels=dict(x="Predicted", y="Actual", color="Count"),
         text_auto=True,
     )
 
     fig.update_layout(
-        title=dict(text="<b>Confusion Matrix Heatmap</b>", font=dict(size=18, color="#F8FAFC")),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#F8FAFC"),
-        height=400,
-        margin=dict(l=30, r=30, t=50, b=30),
+        **_base_layout(height=400, margin=dict(l=30, r=30, t=55, b=30)),
+        title=dict(
+            text="<b>Confusion Matrix</b>",
+            font=dict(size=15, color=_TEXT, family=_FONT),
+        ),
+        coloraxis_showscale=False,
+        xaxis=dict(tickfont=dict(color=_TEXT, size=12), side="bottom"),
+        yaxis=dict(tickfont=dict(color=_TEXT, size=12)),
     )
+    fig.update_traces(textfont=dict(color=_TEXT, size=12))
     return fig
